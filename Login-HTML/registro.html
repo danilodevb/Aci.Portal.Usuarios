@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACINPRO — Crear cuenta</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+
+<body>
+    <div class="pantalla">
+
+        <!-- ESCENARIO (idéntico al login) -->
+        <div class="escenario" aria-hidden="true">
+            <div class="brillo"></div>
+            <div class="logo-contenedor">
+                <div class="linea-luz"></div>
+                <img class="logo" alt="Clave de sol decorativa de ACINPRO" src="assets/clave-sol.png">
+                <div class="marca" aria-label="Acinpro">
+                    <span class="letra">A</span><span class="letra">c</span><span class="letra">i</span>
+                    <span class="letra">n</span><span class="letra">p</span><span class="letra">r</span>
+                    <span class="letra">o</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL REGISTRO -->
+        <section class="panel-login panel-registro">
+
+            <h1 class="titulo">
+                Crear cuenta
+                <span class="subtitulo">Portal web Acinpro</span>
+            </h1>
+
+            <p class="aviso-credenciales">
+                <strong>Importante:</strong> Al realizar esta solicitud, entrará en proceso de evaluación. Si es aceptada, recibirá en su correo electrónico
+                las <em>credenciales</em> de acceso al portal.
+            </p>
+
+            <form id="formularioRegistro" autocomplete="on" novalidate>
+
+                <div class="campo">
+                    <input id="nombre" name="nombre" type="text"
+                           placeholder="Nombre completo"
+                           autocomplete="name" required>
+                </div>
+
+                <div class="campo">
+                    <input id="correo" name="correo" type="email"
+                           placeholder="Correo electrónico"
+                           autocomplete="email" required>
+                </div>
+
+                <!-- Tipo de identificación -->
+                <div class="campo campo-select">
+                    <select id="tipoIdentificacion" name="tipoIdentificacion" required>
+                        <option value="" disabled selected hidden>Tipo de identificación</option>
+                        <option value="CC">CC</option>
+                        <option value="TI">TI</option>
+                        <option value="NIT">NIT</option>
+                    </select>
+                    <span class="select-flecha" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </span>
+                </div>
+
+                <!-- Número de identificación -->
+                <div class="campo">
+                    <input id="documento" name="documento" type="text"
+                           placeholder="Número de identificación"
+                           inputmode="numeric"
+                           autocomplete="off" required>
+                </div>
+
+                <!-- Tipo de usuario -->
+                <h3 class="perfil-seccion" style="margin-top: 5px; margin-bottom: 5px;">Tipo de usuario</h3>
+                <div class="tipo-usuario-grid">
+                    <label class="recordar">
+                        <input type="checkbox" name="tipoUsuario" value="Productor">
+                        <span>Productor</span>
+                    </label>
+                    <label class="recordar">
+                        <input type="checkbox" name="tipoUsuario" value="Artista">
+                        <span>Artista</span>
+                    </label>
+                    <label class="recordar">
+                        <input type="checkbox" name="tipoUsuario" value="Proveedor">
+                        <span>Proveedor</span>
+                    </label>
+                    <label class="recordar">
+                        <input type="checkbox" name="tipoUsuario" value="Empleado">
+                        <span>Empleado</span>
+                    </label>
+		    <label class="recordar">
+                        <input type="checkbox" name="tipoUsuario" value="Radio o TV">
+                        <span>Radio o TV</span>
+                    </label>
+                    <label class="recordar">
+                        <input type="checkbox" name="tipoUsuario" value="Eventos">
+                        <span>Eventos</span>
+                    </label>
+                </div>
+
+                <div class="acciones acciones-registro">
+                    <label class="recordar recordar-largo">
+                        <input id="terminos" type="checkbox" required>
+                        <span>
+                            Acepto el
+                            <a href="https://asociacion-colombiana-de-interpretes-productores.docuware.cloud/docuware/formsweb/web-autorizacion-tratamiento-datos-personales"
+                               target="_blank" rel="noopener noreferrer"
+                               class="enlace-terminos">
+                                tratamiento de datos personales
+                            </a>
+                        </span>
+                    </label>
+                </div>
+
+                <div class="acciones acciones-boton">
+                    <button class="boton boton-ancho" type="submit">Solicitar</button>
+                </div>
+
+                <div class="estado" id="estadoReg" aria-live="polite"></div>
+
+                <a href="index.html" class="olvido">← Volver al login</a>
+
+            </form>
+        </section>
+
+        <!-- TOAST DE ÉXITO -->
+        <div class="toast" id="toastRegistro" role="status" aria-live="polite">
+            <div class="toast-icono">✓</div>
+            <div class="toast-texto">
+                <strong>¡Solicitud enviada!</strong>
+                <span>Cuando sea aprobada recibirás tu usuario y contraseña en el correo registrado.</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="js/registro.js"></script>
+</body>
+</html>

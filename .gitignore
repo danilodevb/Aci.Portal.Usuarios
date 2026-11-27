@@ -1,0 +1,26 @@
+
+# Dependencias
+node_modules/
+
+# Archivos generados
+dist/
+build/
+
+# Configuraciones locales
+.env
+.env.*
+
+# Archivos de Visual Studio
+.vs/
+.vscode/
+
+# Archivos de compilación
+bin/
+obj/
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACINPRO — Recuperar acceso</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/animations.css">
+</head>
+
+<body>
+<div class="pantalla">
+
+    <div class="escenario" aria-hidden="true">
+        <div class="brillo"></div>
+        <div class="logo-contenedor">
+            <div class="linea-luz"></div>
+            <img class="logo" alt="Clave de sol decorativa de ACINPRO" src="assets/clave-sol.png">
+            <div class="marca" aria-label="Acinpro">
+                <span class="letra">A</span><span class="letra">c</span><span class="letra">i</span>
+                <span class="letra">n</span><span class="letra">p</span><span class="letra">r</span>
+                <span class="letra">o</span>
+            </div>
+        </div>
+    </div>
+
+    <section class="panel-login panel-recuperar">
+
+        <h1 class="titulo">
+            Recuperar acceso
+            <span class="subtitulo">Portal web Acinpro</span>
+        </h1>
+
+        <!-- PASO 1: identificar -->
+        <form id="formularioRecuperar" autocomplete="on" novalidate>
+
+            <p class="ayuda">
+                Ingresa tu correo electrónico y te enviaremos un enlace
+                para restablecer tu contraseña.
+            </p>
+
+            <div class="campo">
+                <input id="identificador" name="identificador" type="text"
+                       placeholder="Correo electrónico""
+                       autocomplete="username" required>
+            </div>
+
+            <div class="acciones acciones-centradas">
+                <button class="boton boton-ancho" type="submit">
+                    Enviar enlace
+                </button>
+            </div>
+
+            <div class="estado" id="estadoRec" aria-live="polite"></div>
+
+            <div class="enlaces-secundarios">
+                <a href="index.html" class="olvido">← Volver al login</a>
+                <a href="registro.html" class="olvido">Crear cuenta</a>
+            </div>
+
+        </form>
+
+        <!-- PASO 2: confirmación (oculto hasta enviar) -->
+        <div class="confirmacion" id="confirmacionRec" hidden>
+            <div class="confirmacion-icono">✉</div>
+            <h2>Revisa tu correo</h2>
+            <p>
+                Si el usuario existe, enviamos un enlace a
+                <strong id="correoMostrado"></strong>
+                con instrucciones para restablecer la contraseña.
+            </p>
+            <p class="nota">El enlace expira en 30 minutos.</p>
+
+            <a href="index.html" class="boton boton-ancho boton-secundario">
+                ← Volver al inicio de sesión
+            </a>
+        </div>
+
+    </section>
+
+</div>
+
+<script src="js/recuperar.js"></script>
+</body>
+</html>

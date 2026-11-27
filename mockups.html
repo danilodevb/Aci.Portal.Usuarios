@@ -1,0 +1,2552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACINPRO — Portal de Gestión Completo (Todos los Perfiles)</title>
+    <style>
+         :root {
+             --borde: #000;
+             --fondo: #fff;
+             --gris-claro: #f4f4f4;
+             --gris-oscuro: #e0e0e0;
+             --texto: #333;
+             --fuente: Arial, sans-serif;
+         }
+
+         * { box-sizing: border-box; margin: 0; padding: 0; }
+
+         body {
+             font-family: var(--fuente);
+             background: var(--gris-claro);
+             color: var(--texto);
+             height: 100vh;
+             display: flex;
+             flex-direction: column;
+             overflow: hidden;
+         }
+
+         .proto-nav {
+             background: #222;
+             color: white;
+             padding: 8px 15px;
+             display: flex;
+             gap: 8px;
+             align-items: center;
+             flex-wrap: wrap;
+             font-size: 13px;
+             z-index: 100;
+             border-bottom: 2px solid #000;
+         }
+
+             .proto-nav button {
+                 background: #444;
+                 color: white;
+                 border: 1px solid #666;
+                 padding: 5px 10px;
+                 cursor: pointer;
+                 border-radius: 4px;
+                 font-family: inherit;
+                 font-size: 12px;
+                 transition: 0.2s;
+             }
+
+                 .proto-nav button:hover { background: #555; }
+                 .proto-nav button.active {
+                     background: #fff;
+                     color: #000;
+                     border-color: #fff;
+                     font-weight: bold;
+                 }
+
+         .app-frame {
+             flex: 1;
+             display: flex;
+             overflow: hidden;
+             background: var(--fondo);
+             margin: 15px;
+             border: 2px solid var(--borde);
+             position: relative;
+         }
+
+         .auth-view {
+             display: none;
+             flex: 1;
+             padding: 40px;
+             align-items: center;
+             justify-content: center;
+             width: 100%;
+             height: 100%;
+             background: var(--fondo);
+         }
+
+             .auth-view.active { display: flex; }
+
+         .auth-escenario {
+             flex: 1;
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: center;
+             border-right: 2px dashed var(--borde);
+             height: 100%;
+             margin-right: 40px;
+         }
+
+         .logo-circulo {
+             width: 120px;
+             height: 120px;
+             border: 3px solid var(--borde);
+             border-radius: 50%;
+             display: grid;
+             place-items: center;
+             font-weight: bold;
+             font-size: 20px;
+             letter-spacing: 2px;
+             margin-bottom: 20px;
+         }
+
+         .auth-marca { font-size: 32px; font-weight: bold; letter-spacing: 5px; }
+
+         .auth-panel {
+             width: 380px;
+             border: 2px solid var(--borde);
+             padding: 30px;
+             background: var(--fondo);
+             box-shadow: 5px 5px 0 var(--gris-oscuro);
+         }
+
+             .auth-panel h2 { font-size: 22px; text-align: center; margin-bottom: 5px; text-transform: uppercase; }
+             .auth-panel .sub { text-align: center; font-size: 12px; color: var(--gris-texto); margin-bottom: 20px; display: block; }
+
+         .internal-layout { display: none; width: 100%; height: 100%; transition: all 0.3s ease; }
+             .internal-layout.active { display: flex; }
+
+         .sidebar {
+             width: 300px;
+             border-right: 2px solid var(--borde);
+             display: flex;
+             flex-direction: column;
+             background: var(--gris-claro);
+             flex-shrink: 0;
+             transition: width 0.3s ease;
+         }
+
+         .sidebar-header {
+             padding: 15px;
+             border-bottom: 2px solid var(--borde);
+             display: flex;
+             align-items: center;
+             gap: 10px;
+             font-weight: bold;
+             font-size: 15px;
+             flex-shrink: 0;
+             transition: padding 0.3s;
+         }
+
+             .sidebar-header .logo-circulo {
+                 width: 35px; height: 35px; font-size: 9px; margin-bottom: 0; border-width: 2px; flex-shrink: 0;
+             }
+
+         .sidebar-header-text { transition: opacity 0.2s; white-space: nowrap; }
+
+         .sidebar-search {
+             padding: 10px 15px;
+             border-bottom: 2px solid var(--borde);
+             background: var(--fondo);
+             position: relative;
+             flex-shrink: 0;
+             display: flex;
+             align-items: center;
+             transition: padding 0.3s;
+         }
+
+             .sidebar-search input {
+                 width: 100%;
+                 padding: 8px 30px 8px 32px;
+                 border: 1px solid var(--borde);
+                 font-family: inherit;
+                 font-size: 12px;
+                 background: var(--fondo);
+             }
+
+         .icono-lupa {
+             position: absolute; left: 22px; top: 50%; transform: translateY(-50%);
+             width: 14px; height: 14px; pointer-events: none; color: #666;
+         }
+
+         .menu-list {
+             list-style: none; overflow-y: scroll; flex: 1; padding: 0;
+         }
+
+             .menu-list::-webkit-scrollbar { width: 10px; }
+             .menu-list::-webkit-scrollbar-track { background: var(--gris-claro); border-left: 1px solid #ccc; }
+             .menu-list::-webkit-scrollbar-thumb { background: #666; border: 1px solid var(--borde); }
+
+         .menu-item {
+             padding: 12px 15px;
+             border-bottom: 1px solid var(--borde);
+             font-size: 13px;
+             cursor: pointer;
+             background: var(--gris-oscuro);
+             display: flex;
+             align-items: center;
+             gap: 10px;
+             user-select: none;
+             white-space: nowrap;
+             transition: padding 0.3s;
+         }
+
+             .menu-item:hover { background: var(--fondo); }
+
+         .menu-icon {
+             width: 18px; height: 18px; flex-shrink: 0;
+             border: 1px dashed #666; background: #e0e0e0;
+             display: flex; align-items: center; justify-content: center;
+             font-size: 10px; color: #999;
+         }
+
+         .submenu { display: none; list-style: none; background: #f9f9f9; border-bottom: 1px solid var(--borde); }
+             .submenu.open { display: block; }
+
+         .submenu-item {
+             padding: 10px 15px 10px 30px;
+             font-size: 12px;
+             cursor: pointer;
+             border-bottom: 1px dashed #ccc;
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             white-space: nowrap;
+         }
+
+             .submenu-item:hover { background: var(--gris-oscuro); }
+
+         .subsubmenu { display: none; list-style: none; background: #fff; }
+             .subsubmenu.open { display: block; }
+
+         .subsubmenu-item {
+             padding: 8px 15px 8px 45px;
+             font-size: 12px;
+             cursor: pointer;
+             border-bottom: 1px dotted #ccc;
+             color: #555;
+             white-space: nowrap;
+         }
+
+             .subsubmenu-item:hover { background: var(--gris-claro); color: #000; }
+
+         .menu-item.active,
+         .submenu-item.active,
+         .subsubmenu-item.active {
+             background: var(--fondo) !important;
+             font-weight: bold !important;
+             border-left: 4px solid var(--borde) !important;
+             padding-left: 11px !important;
+             color: #000 !important;
+         }
+
+         .submenu-item.active { padding-left: 26px !important; }
+         .subsubmenu-item.active { padding-left: 41px !important; }
+
+         .toggle-indicator { font-weight: bold; font-size: 14px; margin-left: auto; }
+
+         .main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+
+         .top-header {
+             height: 55px; border-bottom: 2px solid var(--borde);
+             display: flex; justify-content: space-between; align-items: center;
+             padding: 0 20px; background: var(--fondo);
+             flex-shrink: 0;
+         }
+
+         .breadcrumb {
+             font-size: 13px; color: var(--gris-texto);
+             display: flex; align-items: center; gap: 15px;
+         }
+
+             .breadcrumb b { color: #000; }
+
+         .user-info {
+             font-size: 13px; display: flex; gap: 20px;
+             align-items: center; font-weight: bold;
+         }
+
+         .notif-text { cursor: pointer; font-size: 13px; text-decoration: underline; }
+
+         /* Campanita y panel de notificaciones (modo mockup) */
+         .notif-wrapper { position: relative; }
+
+         .notif-btn {
+             position: relative;
+             width: 36px; height: 36px; border-radius: 50%;
+             background: var(--gris-claro); border: 1px solid var(--borde);
+             display: flex; align-items: center; justify-content: center;
+             cursor: pointer;
+         }
+
+             .notif-btn:hover { background: var(--gris-oscuro); }
+             .notif-btn svg { width: 18px; height: 18px; }
+
+         .notif-badge {
+             position: absolute; top: -5px; right: -5px;
+             min-width: 18px; height: 18px; border-radius: 9px;
+             background: var(--borde); color: var(--fondo);
+             font-size: 10px; font-weight: bold;
+             display: flex; align-items: center; justify-content: center;
+             border: 1px solid var(--fondo);
+         }
+
+         .notif-panel {
+             display: none;
+             position: absolute; top: calc(100% + 8px); right: 0;
+             width: 270px; z-index: 1001;
+             background: var(--fondo); border: 2px solid var(--borde);
+             box-shadow: 5px 5px 0 rgba(0,0,0,0.3);
+         }
+
+             .notif-panel.active { display: block; }
+
+         .notif-panel-head {
+             padding: 12px 15px; border-bottom: 2px solid var(--borde);
+             background: var(--gris-claro);
+             font-size: 13px; text-transform: uppercase;
+         }
+
+         .notif-panel ul { list-style: none; }
+
+         .notif-panel li {
+             padding: 12px 15px; border-bottom: 1px solid var(--borde);
+             font-size: 12px; font-weight: normal; cursor: pointer;
+         }
+
+             .notif-panel li:last-child { border-bottom: none; }
+             .notif-panel li:hover { background: var(--gris-oscuro); }
+
+         .btn-toggle-sidebar {
+             background: var(--gris-claro); border: 1px solid var(--borde);
+             width: 34px; height: 34px;
+             display: flex; align-items: center; justify-content: center;
+             cursor: pointer; transition: 0.2s;
+         }
+
+             .btn-toggle-sidebar:hover { background: var(--gris-oscuro); }
+
+             .btn-toggle-sidebar svg { width: 20px; height: 20px; stroke: #000; stroke-width: 2; }
+
+         .toolbar {
+             background: var(--gris-claro); border-bottom: 2px solid var(--borde);
+             padding: 10px 20px;
+             display: flex; align-items: center; gap: 10px;
+             overflow-x: auto;
+             flex-shrink: 0;
+         }
+
+         .toolbar-label { font-size: 11px; font-weight: bold; text-transform: uppercase; white-space: nowrap; margin-right: 10px; }
+
+         .draggable-chip {
+             padding: 6px 12px; border: 1px dashed var(--borde);
+             background: var(--fondo); font-size: 12px; cursor: pointer;
+             user-select: none; display: flex; align-items: center;
+         }
+
+             .draggable-chip:hover { background: var(--gris-oscuro); }
+
+         .canvas {
+             flex: 1; padding: 20px; overflow-y: auto;
+             background-image: linear-gradient(var(--gris-oscuro) 1px, transparent 1px), linear-gradient(90deg, var(--gris-oscuro) 1px, transparent 1px);
+             background-size: 20px 20px;
+             position: relative;
+         }
+
+         /* Bloquea el scroll del canvas cuando se ve el perfil */
+         .canvas.sin-scroll {
+             overflow: hidden;
+             padding: 10px;
+         }
+
+         .widget-grid {
+             display: grid; grid-template-columns: repeat(12, 1fr);
+             grid-auto-rows: 80px; gap: 15px; min-height: 100%; position: relative;
+         }
+
+         .widget-grid.perfil-mode { display: block; grid-auto-rows: auto; min-height: 0; }
+
+         .perfil-page {
+             background: #fff; border: 2px solid var(--borde);
+             padding: 10px 12px; box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+         }
+
+         .widget {
+             background: var(--fondo); border: 2px solid var(--borde);
+             display: flex; flex-direction: column; position: relative;
+             box-shadow: 3px 3px 0 rgba(0,0,0,0.1); min-height: 80px;
+         }
+
+             .widget.arrastrando { opacity: 0.5; }
+
+         .widget-head {
+             padding: 8px 10px; border-bottom: 1px solid var(--borde);
+             display: flex; justify-content: space-between; align-items: center;
+             cursor: grab; background: var(--gris-claro);
+             font-size: 12px; font-weight: bold; text-transform: uppercase;
+             user-select: none; flex-shrink: 0;
+         }
+
+             .widget-head:active { cursor: grabbing; }
+
+         .widget-tools { display: flex; gap: 4px; }
+
+         .widget-btn {
+             background: none; border: 1px solid var(--borde);
+             padding: 1px 5px; font-size: 10px; cursor: pointer;
+         }
+
+             .widget-btn:hover { background: var(--borde); color: var(--fondo); }
+
+         .widget-body { flex: 1; overflow: auto; padding: 15px; font-size: 13px; }
+
+         .widget-resize {
+             position: absolute; bottom: 0; right: 0;
+             width: 12px; height: 12px; cursor: nwse-resize;
+             background: repeating-linear-gradient(45deg, transparent, transparent 2px, var(--borde) 2px, var(--borde) 4px);
+         }
+
+         .widget-fijo { box-shadow: none; background: #f9f9f9; }
+             .widget-fijo .widget-head { cursor: default; background: #ddd; }
+             .widget-fijo::after {
+                 content: "ANCLADO"; position: absolute; top: 8px; right: 70px;
+                 font-size: 9px; color: #666; font-weight: bold;
+             }
+
+         .widget-placeholder { border: 2px dashed var(--borde); background: rgba(0,0,0,0.05); }
+
+         .dashboard-mockup { display: flex; flex-direction: column; gap: 14px; width: 100%; height: 100%; min-height: 100%; box-sizing: border-box; }
+         .widget-grid.dashboard-mode { display: block; height: 100%; min-height: 100%; padding: 0; }
+         .dashboard-mockup-header {
+             display: flex; align-items: center; justify-content: space-between; gap: 12px;
+             border: 2px solid var(--borde); border-left-width: 6px; padding: 14px 18px; background: var(--gris-claro);
+         }
+         .dashboard-mockup-header h2 { font-size: 23px; margin: 4px 0; }
+         .dashboard-mockup-header p, .dashboard-mockup-header small { font-size: 12px; color: #555; }
+         .dashboard-role {
+             border: 1px solid var(--borde); background: var(--fondo);
+             padding: 8px 12px; font-size: 12px; font-weight: bold; white-space: nowrap;
+         }
+         .dashboard-stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+         .dashboard-stat {
+             min-height: clamp(90px, 14vh, 155px); border: 2px solid var(--borde); padding: 14px;
+             background: var(--gris-claro); box-shadow: 3px 3px 0 rgba(0,0,0,0.12);
+             display: flex; flex-direction: column; justify-content: space-between;
+         }
+         .dashboard-stat span { font-size: 12px; font-weight: bold; text-transform: uppercase; }
+         .dashboard-stat strong { font-size: 32px; line-height: 1; }
+         .dashboard-stat small { font-size: 11px; color: #555; }
+         .dashboard-lower { display: grid; grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr); gap: 12px; flex: 1; min-height: 200px; }
+         .dashboard-panel { min-width: 0; border: 2px solid var(--borde); padding: 14px; background: var(--fondo); box-shadow: 3px 3px 0 rgba(0,0,0,0.08); }
+         .dashboard-panel h3 { font-size: 13px; text-transform: uppercase; margin-bottom: 10px; }
+         .dashboard-panel .wf-table th, .dashboard-panel .wf-table td { padding: 8px 10px; font-size: 11px; }
+         .dashboard-quick-actions { display: flex; flex-direction: column; gap: 8px; }
+         .dashboard-quick-actions .wf-btn { justify-content: flex-start; width: 100%; min-height: 36px; padding: 7px 10px; font-size: 11px; }
+
+         .w-3 { grid-column: span 3; }
+         .w-4 { grid-column: span 4; }
+         .w-6 { grid-column: span 6; }
+         .w-8 { grid-column: span 8; }
+         .w-12 { grid-column: span 12; }
+
+         .h-2 { grid-row: span 2; }
+         .h-3 { grid-row: span 3; }
+         .h-4 { grid-row: span 4; }
+         .h-5 { grid-row: span 5; }
+         .h-6 { grid-row: span 6; }
+
+         .wf-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+             .wf-table th, .wf-table td { border: 1px solid var(--borde); padding: 8px; text-align: left; }
+             .wf-table th { background: var(--gris-oscuro); }
+
+         .wf-btn {
+             border: 1px solid var(--borde); background: var(--gris-claro);
+             padding: 6px 12px; font-size: 11px; cursor: pointer;
+             display: inline-flex; align-items: center; justify-content: center;
+         }
+
+             .wf-btn:hover { background: var(--gris-oscuro); }
+
+         .wf-btn-primary { background: var(--borde); color: var(--fondo); }
+             .wf-btn-primary:hover { background: #333; }
+
+         .wf-input {
+             border: 1px solid var(--borde); padding: 8px; width: 100%;
+             margin-bottom: 10px; font-family: inherit; font-size: 13px;
+         }
+
+         .wf-label { font-size: 11px; display: block; margin-bottom: 3px; font-weight: bold; }
+
+         .wf-img {
+             border: 1px solid var(--borde); position: relative;
+             display: flex; align-items: center; justify-content: center;
+             width: 100%; height: 100%; min-height: 60px;
+             background: var(--gris-claro); color: #666; font-size: 11px; overflow: hidden;
+         }
+
+             .wf-img::before, .wf-img::after {
+                 content: ''; position: absolute; background: var(--borde);
+                 width: 141%; height: 1px; top: 50%; left: 50%;
+             }
+
+             .wf-img::before { transform: translate(-50%, -50%) rotate(45deg); }
+             .wf-img::after { transform: translate(-50%, -50%) rotate(-45deg); }
+
+         .modal-overlay {
+             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+             background: rgba(0,0,0,0.5); display: none;
+             align-items: center; justify-content: center; z-index: 1000;
+         }
+
+             .modal-overlay.active { display: flex; }
+
+         .modal-box {
+             background: var(--fondo); border: 2px solid var(--borde);
+             padding: 25px; width: 500px; max-width: 90%;
+             box-shadow: 5px 5px 0 rgba(0,0,0,0.3);
+         }
+
+             .modal-box h3 {
+                 margin-bottom: 15px; text-transform: uppercase; font-size: 16px;
+                 border-bottom: 1px solid var(--borde); padding-bottom: 10px;
+             }
+
+         .toast {
+             position: fixed; bottom: 20px; right: 20px;
+             background: #000; color: #fff;
+             padding: 12px 20px; border-radius: 4px;
+             font-size: 13px; font-weight: bold;
+             display: flex; align-items: center; gap: 10px;
+             transform: translateY(100px); opacity: 0;
+             transition: 0.3s; z-index: 2000;
+         }
+
+             .toast.show { transform: translateY(0); opacity: 1; }
+
+         .internal-layout.sidebar-colapsado .sidebar { width: 60px; min-width: 60px; max-width: 60px; }
+         .internal-layout.sidebar-colapsado .sidebar-header { padding: 15px 10px; justify-content: center; }
+         .internal-layout.sidebar-colapsado .sidebar-header-text,
+         .internal-layout.sidebar-colapsado .menu-item span:not(.toggle-indicator),
+         .internal-layout.sidebar-colapsado .menu-item .toggle-indicator,
+         .internal-layout.sidebar-colapsado .submenu,
+         .internal-layout.sidebar-colapsado .subsubmenu,
+         .internal-layout.sidebar-colapsado .sidebar-search input { display: none !important; }
+         .internal-layout.sidebar-colapsado .menu-item { padding: 15px 10px; justify-content: center; }
+         .internal-layout.sidebar-colapsado .sidebar-search { padding: 10px; justify-content: center; }
+         .internal-layout.sidebar-colapsado .icono-lupa { position: static; transform: none; width: 20px; height: 20px; }
+
+         .modal-box.perfil-modal { width: 780px; max-width: 96%; max-height: 90%; overflow-y: auto; }
+
+         .perfil-roles { display: flex; gap: 8px; flex-wrap: wrap; }
+
+         .perfil-chip {
+             border: 1px solid #000; background: #000; color: #fff;
+             font-size: 11px; font-weight: bold; padding: 3px 8px; letter-spacing: 0.5px;
+         }
+
+         .perfil-encabezado {
+             display: flex; justify-content: space-between; align-items: center;
+             flex-wrap: wrap; gap: 8px;
+             border-bottom: 2px solid var(--borde);
+             padding-bottom: 6px; margin-bottom: 8px;
+         }
+
+             .perfil-encabezado h3 { font-size: 15px; text-transform: uppercase; }
+
+         .perfil-tabs {
+             display: flex; gap: 6px; border-bottom: 2px solid var(--borde);
+             margin-bottom: 8px; flex-wrap: wrap;
+         }
+
+         .perfil-tab {
+             background: var(--gris-claro); border: 1px solid var(--borde); border-bottom: none;
+             padding: 5px 12px; font-size: 12px; font-weight: bold;
+             cursor: pointer; font-family: inherit;
+         }
+
+             .perfil-tab.active { background: var(--borde); color: var(--fondo); }
+
+         .perfil-tab-content { display: none; }
+         .perfil-tab-content.active { display: block; }
+
+         .perfil-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 15px; }
+
+         .perfil-seccion {
+             border: 1px solid var(--borde); padding: 12px;
+             margin-bottom: 15px; background: #fafafa;
+         }
+
+             .perfil-seccion h4 {
+                 font-size: 12px; text-transform: uppercase; margin-bottom: 10px;
+                 border-bottom: 1px dashed #999; padding-bottom: 5px;
+             }
+
+         .perfil-acciones {
+             display: flex; justify-content: flex-end; gap: 10px;
+             margin-top: 10px; border-top: 1px solid #000; padding-top: 12px;
+         }
+
+         /* Versión compacta: solo afecta a los formularios de Mi perfil */
+         .perfil-page .perfil-grid { gap: 0 10px; }
+         .perfil-page .perfil-grid > div { min-width: 0; }
+         .perfil-page .perfil-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+         .perfil-page .perfil-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+         .perfil-page .wf-input { height: 28px; padding: 3px 8px; margin-bottom: 6px; font-size: 12px; }
+         .perfil-page .wf-label { margin-bottom: 2px; }
+         .perfil-page .perfil-seccion { padding: 8px 10px; margin-bottom: 8px; min-width: 0; }
+         .perfil-page .perfil-seccion h4 { margin-bottom: 6px; padding-bottom: 3px; }
+         .perfil-page .perfil-acciones { margin-top: 0; padding-top: 8px; }
+
+         .perfil-columnas { display: grid; gap: 0 8px; }
+         .perfil-columnas.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+         .perfil-columnas.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+         .perfil-check { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 6px; }
+
+         .perfil-fila { display: flex; gap: 10px; align-items: center; }
+             .perfil-fila .wf-input { flex: 1; min-width: 0; }
+             .perfil-page .perfil-fila .wf-input { margin-bottom: 0; }
+             .perfil-fila .wf-btn { height: 28px; }
+
+         .menu-search-context {
+             display: none; margin-left: auto; padding: 2px 6px;
+             border: 1px solid #aaa; border-radius: 10px;
+             color: #333; font-size: 9px; font-weight: bold; letter-spacing: .3px;
+         }
+         .menu-search-context.visible { display: inline-flex; }
+
+         @media (max-width: 900px) {
+             .internal-layout { position: relative; min-width: 0; overflow: hidden; }
+             .internal-layout .sidebar {
+                 display: none; position: absolute; top: 55px; left: 12px; z-index: 1000;
+                 width: min(340px, calc(100% - 24px)); max-height: calc(100% - 70px);
+                 box-sizing: border-box; flex-direction: column; align-items: stretch;
+                 overflow-x: hidden; overflow-y: auto; padding: 14px; gap: 12px;
+                 border: 1px solid #888; border-radius: 12px;
+                 background: var(--gris-claro); box-shadow: 0 16px 40px rgba(0,0,0,.3);
+             }
+             .internal-layout.menu-responsive-abierto .sidebar { display: flex; }
+             .sidebar-header { padding: 0; border: 0; flex-shrink: 0; }
+             .sidebar-header-text span { display: none; }
+             .sidebar-search { padding: 10px 0; flex-shrink: 0; }
+             .sidebar-search input { width: 100%; }
+             .menu-list {
+                 display: flex; flex-direction: column; gap: 4px; min-height: 0;
+                 overflow: visible; scrollbar-width: none;
+             }
+             .menu-list::-webkit-scrollbar { display: none; }
+             .menu-list > li { flex-shrink: 0; }
+             .menu-item, .submenu-item {
+                 width: 100%; min-height: 40px; white-space: normal;
+             }
+             .subsubmenu-item { white-space: normal; }
+             .main-area { width: 100%; min-width: 0; }
+             .top-header {
+                 height: auto; min-height: 55px; flex-wrap: wrap; align-items: center;
+                 gap: 8px; padding: 12px 16px;
+             }
+             .breadcrumb { flex: 1 1 270px; min-width: 0; flex-wrap: wrap; }
+             .user-info { flex: 0 1 auto; gap: 12px; margin-left: auto; }
+             .perfil-page .perfil-grid.cols-3,
+             .perfil-page .perfil-grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+             .dashboard-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+             .dashboard-lower { grid-template-columns: minmax(0, 1fr); }
+             .dashboard-stat { min-height: clamp(70px, 10vh, 105px); }
+         }
+
+         @media (min-width: 701px) and (max-width: 900px) {
+             .dashboard-lower { grid-template-columns: minmax(0, 1.3fr) minmax(190px, 1fr); }
+         }
+
+         @media (max-width: 700px) {
+             .auth-view {
+                 height: 100%; min-height: 0; flex-direction: column; justify-content: flex-start;
+                 gap: 14px; overflow-y: auto; padding: 18px 14px;
+             }
+             .auth-escenario {
+                 flex: 0 0 auto; height: auto; width: 100%; margin: 0; border: 0;
+             }
+             .auth-escenario .logo-circulo {
+                 width: 68px; height: 68px; margin-bottom: 8px; font-size: 12px;
+             }
+             .auth-marca { font-size: 20px; letter-spacing: 3px; }
+             .auth-panel { width: min(380px, 100%); max-width: 100%; flex: 0 0 auto; padding: 20px; }
+             .top-header { align-items: flex-start; gap: 6px; padding: 10px 12px; }
+             .breadcrumb { flex: 1 1 100%; width: 100%; gap: 8px; font-size: 12px; line-height: 1.35; }
+             .user-info { width: 100%; justify-content: flex-end; gap: 8px; margin-left: 0; }
+             .toolbar { padding: 10px 12px; }
+             .canvas { padding: 12px; }
+             .dashboard-mockup { gap: 10px; }
+             .dashboard-mockup-header { align-items: flex-start; flex-direction: column; padding: 10px 12px; }
+             .dashboard-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+             .dashboard-stat { min-height: 76px; padding: 10px 12px; }
+             .dashboard-stat span { font-size: 10px; }
+             .dashboard-stat strong { font-size: 24px; }
+             .dashboard-stat small { font-size: 10px; }
+             .dashboard-lower { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+             .dashboard-panel { padding: 10px; }
+             .dashboard-panel .wf-table { table-layout: fixed; width: 100%; }
+             .dashboard-panel .wf-table th:last-child,
+             .dashboard-panel .wf-table td:last-child { display: none; }
+             .dashboard-quick-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+             .dashboard-quick-actions .wf-btn { min-width: 0; white-space: normal; }
+             .perfil-page { min-height: 100%; padding: 10px; }
+             .perfil-page .perfil-grid,
+             .perfil-page .perfil-grid.cols-2,
+             .perfil-page .perfil-grid.cols-3,
+             .perfil-page .perfil-grid.cols-4,
+             .perfil-page .perfil-columnas,
+             .perfil-page .perfil-columnas.cols-2,
+             .perfil-page .perfil-columnas.cols-3 { grid-template-columns: minmax(0, 1fr); }
+             .perfil-tabs { flex-wrap: nowrap; overflow-x: auto; }
+             .perfil-tab { flex: 0 0 auto; }
+             .perfil-acciones { flex-wrap: wrap; }
+             .perfil-acciones .wf-btn { flex: 1 1 140px; }
+             .perfil-fila { align-items: stretch; flex-wrap: wrap; }
+             .canvas.sin-scroll { height: auto; overflow-y: auto !important; }
+             .widget-grid.perfil-mode { height: auto; }
+             .perfil-tab-content.active { overflow: visible; }
+         }
+
+         @media (max-width: 560px) {
+             .dashboard-mockup-header h2 { font-size: 19px; }
+             .dashboard-panel .wf-table th,
+             .dashboard-panel .wf-table td { padding: 6px 7px; font-size: 10px; }
+             .perfil-encabezado { align-items: flex-start; }
+         }
+
+         @media (max-width: 400px) {
+             .auth-view { padding: 12px; }
+             .auth-panel { padding: 16px; }
+             .user-info { gap: 6px; font-size: 12px; }
+         }
+
+         /* Estilo para los checkboxes de roles en el registro */
+         .roles-grid {
+             display: grid;
+             grid-template-columns: 1fr 1fr;
+             gap: 10px;
+             margin-bottom: 15px;
+         }
+         .rol-checkbox {
+             display: flex;
+             align-items: center;
+             gap: 8px;
+             font-size: 12px;
+             border: 1px solid var(--borde);
+             padding: 8px;
+             background: var(--fondo);
+             cursor: pointer;
+         }
+         .rol-checkbox input {
+             cursor: pointer;
+         }
+
+         /* Estilo para el punto del input en modo mockup */
+         .input-mockup-wrapper {
+             position: relative;
+             width: 100%;
+             margin-bottom: 10px;
+         }
+         .input-mockup-wrapper .wf-input {
+             margin-bottom: 0; /* Quitamos el margen porque lo maneja el wrapper */
+             padding-left: 28px; /* Espacio para el punto */
+         }
+         .input-mockup-dot {
+             position: absolute;
+             left: 10px;
+             top: 50%;
+             transform: translateY(-50%);
+             width: 8px;
+             height: 8px;
+             background-color: var(--gris-oscuro); /* Relleno gris claro para mockup */
+             border: 1.5px solid var(--borde); /* Borde negro */
+             border-radius: 50%;
+             pointer-events: none;
+             z-index: 2;
+         }
+
+         /* Estilo para el icono del ojo */
+         .toggle-password-icon {
+             position: absolute;
+             right: 10px;
+             top: 50%;
+             transform: translateY(-50%);
+             cursor: pointer;
+             width: 18px;
+             height: 18px;
+             stroke: #666;
+             z-index: 3;
+         }
+         .toggle-password-icon:hover {
+             stroke: #000;
+         }
+         .perfil-password-wrapper {
+             position: relative; width: 100%; margin-bottom: 6px;
+         }
+         .perfil-password-wrapper .wf-input {
+             width: 100%; margin-bottom: 0; padding-left: 8px; padding-right: 38px;
+         }
+         .perfil-password-toggle {
+             position: absolute; top: 50%; right: 4px; transform: translateY(-50%);
+             display: flex; align-items: center; justify-content: center;
+             width: 30px; height: 30px; padding: 0; border: 0;
+             background: transparent; cursor: pointer;
+         }
+         .perfil-password-toggle .toggle-password-icon {
+             position: static; transform: none; width: 18px; height: 18px;
+         }
+    </style>
+</head>
+<body>
+
+    <div class="proto-nav">
+        <strong>Simulador:</strong>
+        <button onclick="cambiarVista('login', this)">1. Login</button>
+        <button onclick="cambiarVista('registro', this)">2. Registro</button>
+        <button onclick="cambiarVista('recuperar', this)">3. Recuperar</button>
+        <button onclick="cambiarVista('admin', this)">4. Admin</button>
+        <button onclick="cambiarVista('empleado', this)">5. Empleado</button>
+        <button onclick="cambiarVista('artista', this)">6. Artista</button>
+        <button onclick="cambiarVista('productor', this)">7. Productor</button>
+        <button onclick="cambiarVista('proveedor', this)">8. Proveedor</button>
+        <button onclick="cambiarVista('cliente', this)">9. Cliente</button>
+        <button onclick="cambiarVista('artistaprod', this)">10. Artista + Productor</button>
+    </div>
+
+    <div class="app-frame">
+
+        <div class="auth-view" id="view-login">
+            <div class="auth-escenario"><div class="logo-circulo">LOGO</div><div class="auth-marca">ACINPRO</div></div>
+            <div class="auth-panel">
+                <h2>Iniciar sesión</h2><span class="sub">Portal web Acinpro</span>
+
+                <div class="input-mockup-wrapper">
+                    <div class="input-mockup-dot"></div>
+                    <input type="text" class="wf-input" placeholder="Correo electrónico">
+                </div>
+
+                <div class="input-mockup-wrapper">
+                    <div class="input-mockup-dot"></div>
+                    <input type="password" class="wf-input" placeholder="Contraseña" id="login-password">
+                    <svg class="toggle-password-icon" onclick="togglePasswordVisibility('login-password', this)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
+                    <label style="font-size:12px; display:flex; align-items:center; gap:5px;"><input type="checkbox"> Recordarme</label>
+                    <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Sesión iniciada correctamente')">Ingresar</button>
+                </div>
+                <div style="text-align:center; margin-top:15px; font-size:12px; display:flex; flex-direction:column; gap:5px;">
+                    <a href="#" onclick="cambiarVista('recuperar', document.querySelector('.proto-nav button:nth-child(4)'))" style="color:#000;">¿Olvidaste tu contraseña?</a>
+                    <a href="#" onclick="cambiarVista('registro', document.querySelector('.proto-nav button:nth-child(3)'))" style="color:#000; font-weight:bold;">¿No tienes cuenta? Crear una</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-view" id="view-registro">
+            <div class="auth-escenario"><div class="logo-circulo">LOGO</div><div class="auth-marca">ACINPRO</div></div>
+            <div class="auth-panel">
+                <h2>Crear cuenta</h2><span class="sub">Portal web Acinpro</span>
+                <div style="border:1px solid #000; padding:8px; font-size:11px; text-align:center; margin-bottom:15px;"><b>Importante:</b> Al realizar esta solicitud, entrará en proceso de evaluación. Si es aceptada, recibirá en su correo electrónico las credenciales de acceso al portal.</div>
+
+                <div class="input-mockup-wrapper">
+                    <div class="input-mockup-dot"></div>
+                    <input type="text" class="wf-input" placeholder="Nombre completo">
+                </div>
+
+                <div class="input-mockup-wrapper">
+                    <div class="input-mockup-dot"></div>
+                    <input type="email" class="wf-input" placeholder="Correo electrónico">
+                </div>
+
+                <div class="input-mockup-wrapper">
+                    <div class="input-mockup-dot"></div>
+                    <select class="wf-input">
+                        <option value="" disabled selected>Tipo de identificación</option>
+                        <option>CC</option>
+                        <option>TI</option>
+                        <option>NIT</option>
+                    </select>
+                </div>
+
+                <div class="input-mockup-wrapper">
+                    <div class="input-mockup-dot"></div>
+                    <input type="text" class="wf-input" placeholder="Número de identificación">
+                </div>
+
+                <label class="wf-label" style="margin-top:5px;">Tipo de usuario</label>
+                <div class="roles-grid">
+                    <label class="rol-checkbox"><input type="checkbox" name="rol" value="productor"> Productor</label>
+                    <label class="rol-checkbox"><input type="checkbox" name="rol" value="artista"> Artista</label>
+                    <label class="rol-checkbox"><input type="checkbox" name="rol" value="proveedor"> Proveedor</label>
+                    <label class="rol-checkbox"><input type="checkbox" name="rol" value="empleado"> Empleado</label>
+                    <label class="rol-checkbox"><input type="checkbox" name="rol" value="RadiooTV"> Radio o TV</label>
+                    <label class="rol-checkbox"><input type="checkbox" name="rol" value="Eventos"> Eventos</label>
+                </div>
+
+                <label style="font-size:12px; display:flex; align-items:center; gap:5px; margin-bottom:15px;">
+                    <input type="checkbox"> Acepto el <a href="#" style="color:#000;">tratamiento de datos personales</a>
+                </label>
+
+                <button class="wf-btn wf-btn-primary" style="width:100%; padding:10px; margin-top:5px;" onclick="mostrarToast('Solicitud enviada')">Solicitar</button>
+                <div style="text-align:center; margin-top:15px; font-size:12px;"><a href="#" onclick="cambiarVista('login', document.querySelector('.proto-nav button:nth-child(2)'))" style="color:#000;">← Volver al login</a></div>
+            </div>
+        </div>
+
+        <div class="auth-view" id="view-recuperar">
+            <div class="auth-escenario"><div class="logo-circulo">LOGO</div><div class="auth-marca">ACINPRO</div></div>
+            <div class="auth-panel">
+                <h2>Recuperar acceso</h2><span class="sub">Portal web Acinpro</span>
+                <p style="font-size:12px; text-align:center; margin-bottom:15px; color:#666;">Ingresa tu correo electrónico.</p>
+
+                <div class="input-mockup-wrapper">
+                    <div class="input-mockup-dot"></div>
+                    <input type="text" class="wf-input" placeholder="Correo electrónico">
+                </div>
+
+                <button class="wf-btn wf-btn-primary" style="width:100%; padding:10px; margin-top:10px;" onclick="mostrarToast('Enlace enviado al correo')">Enviar enlace</button>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 12px;">
+                    <a href="#" onclick="cambiarVista('login', document.querySelector('.proto-nav button:nth-child(2)'))" style="color:#000;">← Volver al login</a>
+                    <a href="#" onclick="cambiarVista('registro', document.querySelector('.proto-nav button:nth-child(3)'))" style="color:#000; font-weight:bold;">Crear cuenta</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="internal-layout" id="internal-layout">
+
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo-circulo">LOGO</div>
+                    <div class="sidebar-header-text">
+                        <strong>ACINPRO</strong><br>
+                        <span style="font-size: 10px; font-weight: normal; color: #666;" id="role-title">Portal</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-search">
+                    <svg class="icono-lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="menu-search" placeholder="Buscar..." oninput="filtrarMenu(this.value)">
+                </div>
+
+                <ul class="menu-list" id="menu-list"></ul>
+            </div>
+
+            <div class="main-area">
+                <div class="top-header">
+                    <div class="breadcrumb">
+                        <button class="btn-toggle-sidebar" id="btnToggleSidebar" title="Mostrar/ocultar menú" aria-label="Mostrar/ocultar menú" aria-expanded="false">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                        Inicio <span>/</span> <b id="breadcrumb-title">Sección</b>
+                    </div>
+                    <div class="user-info">
+                        <div class="notif-wrapper">
+                            <button class="notif-btn" onclick="toggleNotificaciones()" title="Notificaciones" aria-label="Notificaciones (3 pendientes)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                                <span class="notif-badge">3</span>
+                            </button>
+                            <div class="notif-panel" id="notif-panel">
+                                <div class="notif-panel-head">Notificaciones</div>
+                                <ul>
+                                    <li onclick="verNotificacion('Nuevo usuario registrado')">Nuevo usuario registrado</li>
+                                    <li onclick="verNotificacion('Solicitud aprobada')">Solicitud aprobada</li>
+                                    <li onclick="verNotificacion('Documento actualizado')">Documento actualizado</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <span class="notif-text" onclick="abrirPerfil()" title="Ver y editar mi perfil">Mi perfil</span>
+                        <span style="cursor: pointer;" onclick="cambiarVista('login', document.querySelector('.proto-nav button:nth-child(2)'))">[ Salir ]</span>
+                    </div>
+                </div>
+
+                <div class="toolbar" id="toolbar">
+                    <span class="toolbar-label">Acciones disponibles:</span>
+                </div>
+
+                <div class="canvas" id="canvas-principal">
+                    <div class="widget-grid" id="grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-overlay">
+            <div class="modal-box" id="modal-content"></div>
+        </div>
+    </div>
+    <div class="toast" id="toast"><span id="toast-msg">Mensaje</span></div>
+
+    <script>
+        const iconoGenerico = `<div class="menu-icon">?</div>`;
+
+        const menuArtista = [
+            {
+                id: "economico", label: "Gestión Económica", icono: "money", children: [
+                    {
+                        id: "anticipos", label: "Anticipos y Auxilios", widgets: [{
+                            id: 'w_antic', title: 'Solicitar Anticipo', size: 'w-6 h-4', content: `
+                            <label class="wf-label">Monto solicitado (COP)</label>
+                            <input type="number" class="wf-input" placeholder="0">
+                            <label class="wf-label">Motivo</label>
+                            <textarea class="wf-input" rows="2" placeholder="Describe el motivo de la solicitud"></textarea>
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Solicitud de anticipo enviada')">Solicitar</button>`
+                        }]
+                    },
+                    {
+                        id: "regalias", label: "Recaudo de Regalías", widgets: [{
+                            id: 'w_regalias', title: 'Regalías', size: 'w-6 h-4', content: `
+                            <table class="wf-table">
+                                <tr><th>Periodo</th><th>Valor</th><th>Estado</th></tr>
+                                <tr><td>Oct 2025</td><td>$1.250.000</td><td>Pagado</td></tr>
+                                <tr><td>Sep 2025</td><td>$980.000</td><td>Pagado</td></tr>
+                            </table>
+                            <button class="wf-btn" style="margin-top:10px;" onclick="mostrarToast('Certificado de regalías generado')">Descargar certificado</button>`
+                        }]
+                    }
+                ]
+            },
+            {
+                id: "musical", label: "Gestión Musical", icono: "doc", children: [
+                    {
+                        id: "obras", label: "Registro de Obras", widgets: [{
+                            id: 'w_obras', title: 'Registrar Obra', size: 'w-6 h-4', content: `
+                            <label class="wf-label">Nombre de la obra</label>
+                            <input type="text" class="wf-input">
+                            <label class="wf-label">Género</label>
+                            <input type="text" class="wf-input">
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Obra registrada correctamente')">Registrar</button>`
+                        }]
+                    }
+                ]
+            },
+            {
+                id: "servicios", label: "Servicios Activos", icono: "check", widgets: [{
+                    id: 'w_serv', title: 'Servicios', size: 'w-12 h-3', content: `
+                    <ul style="padding-left:18px; font-size:12px; line-height:1.8;">
+                        <li>Registro Musical</li>
+                        <li>Recaudo de Regalías</li>
+                        <li>Anticipos y Auxilios</li>
+                    </ul>`
+                }]
+            },
+            {
+                id: "perfil", label: "Mi Perfil Artístico", icono: "users", widgets: [{
+                    id: 'w_perfil_art', title: 'Perfil', size: 'w-12 h-3', content: `
+                    <p style="font-size:12px; margin-bottom:10px;">Actualiza tu información artística, biografía y fotografías.</p>
+                    <button class="wf-btn wf-btn-primary" onclick="abrirPerfil()">Abrir mi perfil</button>`
+                }]
+            },
+            {
+                id: "eventos", label: "Eventos y Convocatorias", icono: "chart", widgets: [{
+                    id: 'w_eventos', title: 'Convocatorias', size: 'w-12 h-3', content: `
+                    <table class="wf-table">
+                        <tr><th>Evento</th><th>Cierre</th><th>Acción</th></tr>
+                        <tr><td>Festival Nacional</td><td>30 Nov</td><td><button class="wf-btn" onclick="mostrarToast('Postulación registrada')">Postularme</button></td></tr>
+                    </table>`
+                }]
+            },
+            {
+                id: "soporte", label: "Soporte Técnico", icono: "check", widgets: [{
+                    id: 'w_sop_art', title: 'Ayuda', size: 'w-12 h-3', content: `
+                    <p style="margin-bottom:10px;">Abre un ticket de soporte.</p>
+                    <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Ticket de soporte creado')">Nuevo ticket</button>`
+                }]
+            }
+        ];
+
+        const menuProductor = [
+            {
+                id: "tramites", label: "Trámites y Acreditaciones", icono: "check", children: [
+                    {
+                        id: "trazabilidad", label: "Trazabilidad de Trámites", widgets: [{
+                            id: 'w_traz', title: 'Estado de Trámites', size: 'w-12 h-3', content: `
+                            <table class="wf-table">
+                                <tr><th>Trámite</th><th>Estado</th></tr>
+                                <tr><td>Acreditación #1024</td><td>En Proceso</td></tr>
+                            </table>`
+                        }]
+                    },
+                    {
+                        id: "acreditaciones", label: "Registro de Acreditaciones", widgets: [{
+                            id: 'w_acred', title: 'Registrar Acreditación', size: 'w-6 h-4', content: `
+                            <input type="text" class="wf-input" placeholder="Nombre de la obra">
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Acreditación registrada')">Registrar</button>`
+                        }]
+                    },
+                    {
+                        id: "documentos", label: "Actualizar Documentos", widgets: [{
+                            id: 'w_docs_prod', title: 'Documentos', size: 'w-6 h-4', content: `
+                            <input type="file" class="wf-input">
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Documento actualizado')">Subir</button>`
+                        }]
+                    }
+                ]
+            },
+            {
+                id: "economico_prod", label: "Gestión Económica", icono: "money", children: [
+                    {
+                        id: "anticipos_prod", label: "Solicitudes Anticipos", widgets: [{
+                            id: 'w_antic_prod', title: 'Anticipos', size: 'w-6 h-4', content: `
+                            <label class="wf-label">Monto</label>
+                            <input type="number" class="wf-input" placeholder="0">
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Solicitud de anticipo enviada')">Solicitar Anticipo</button>`
+                        }]
+                    },
+                    {
+                        id: "facturacion", label: "Facturación", widgets: [{
+                            id: 'w_fact', title: 'Facturas', size: 'w-6 h-4', content: `
+                            <table class="wf-table">
+                                <tr><th>Factura</th><th>Estado</th></tr>
+                                <tr><td>FV-2025-88</td><td>Pagada</td></tr>
+                            </table>`
+                        }]
+                    }
+                ]
+            },
+            {
+                id: "servicios_prod", label: "Servicios Activos", icono: "check", widgets: [{
+                    id: 'w_serv_prod', title: 'Servicios', size: 'w-12 h-3', content: `<p>Servicios contratados.</p>`
+                }]
+            },
+            {
+                id: "informacion", label: "Solicitar Información", icono: "doc", widgets: [{
+                    id: 'w_info_prod', title: 'Solicitar Info', size: 'w-12 h-3', content: `
+                    <p style="margin-bottom:10px;">Solicita información a ACINPRO.</p>
+                    <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Solicitud de información enviada')">Enviar solicitud</button>`
+                }]
+            },
+            {
+                id: "portafolio", label: "Portafolio de Proyectos", icono: "grid", widgets: [{
+                    id: 'w_port_prod', title: 'Portafolio', size: 'w-12 h-3', content: `<div class="wf-img">Portafolio</div>`
+                }]
+            },
+            {
+                id: "soporte_prod", label: "Soporte", icono: "check", widgets: [{
+                    id: 'w_sop_prod', title: 'Soporte', size: 'w-12 h-3', content: `
+                    <p style="margin-bottom:10px;">Contactar a soporte.</p>
+                    <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Ticket de soporte creado')">Nuevo ticket</button>`
+                }]
+            }
+        ];
+
+        const menuProveedor = [
+            {
+                id: "prov_homologacion", label: "Homologación y Cumplimiento", icono: "doc", children: [
+                    {
+                        id: "prov_registro", label: "Registro de Empresa / Perfil", widgets: [{
+                            id: 'w_prov_registro', title: 'Registro Inicial', size: 'w-8 h-5', content: `
+                            <div class="perfil-grid">
+                                <div><label class="wf-label">Tipo de persona</label><select class="wf-input"><option>Persona Jurídica</option><option>Persona Natural</option></select></div>
+                                <div><label class="wf-label">NIT / Cédula</label><input class="wf-input" placeholder="900.123.456-7"></div>
+                                <div><label class="wf-label">Razón social / Nombre</label><input class="wf-input" placeholder="Suministros ABC S.A.S."></div>
+                                <div><label class="wf-label">Representante legal</label><input class="wf-input" placeholder="Nombre completo"></div>
+                                <div><label class="wf-label">Correo de contacto</label><input class="wf-input" placeholder="compras@empresa.com"></div>
+                                <div><label class="wf-label">Teléfono</label><input class="wf-input" placeholder="+57 300 000 0000"></div>
+                            </div>
+                            <label class="wf-label">Actividad económica (CIIU)</label>
+                            <input class="wf-input" placeholder="Ej. 5920 - Actividades de grabación de sonido">
+                            <label class="wf-label">Documentos de vinculación (Cámara de Comercio, RUT, certificación bancaria)</label>
+                            <input type="file" class="wf-input" multiple>
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Registro enviado. Estado: En validación.')">Guardar y enviar a validación</button>`
+                        },
+                        {
+                            id: 'w_prov_homolog', title: 'Estado de Homologación', size: 'w-4 h-5', content: `
+                            <table class="wf-table">
+                                <tr><th>Requisito</th><th>Estado</th></tr>
+                                <tr><td>Registro de empresa</td><td>Completo</td></tr>
+                                <tr><td>Cámara de Comercio</td><td>Por vencer</td></tr>
+                                <tr><td>RUT</td><td>Vigente</td></tr>
+                                <tr><td>Certificación bancaria</td><td>Pendiente</td></tr>
+                                <tr><td>Póliza / ARL</td><td>Vigente</td></tr>
+                            </table>
+                            <p style="font-size:12px; margin-top:10px;">Habilitación para contratar: <b>85%</b></p>
+                            <button class="wf-btn" style="margin-top:8px;" onclick="mostrarToast('Falta la certificación bancaria para completar la homologación')">Ver detalle</button>`
+                        }]
+                    },
+                    {
+                        id: "prov_renovacion", label: "Renovación de Documentos", widgets: [{
+                            id: 'w_prov_docs', title: 'Documentos con Vencimiento', size: 'w-12 h-4', content: `
+                            <table class="wf-table">
+                                <tr><th>Documento</th><th>Última renovación</th><th>Vence</th><th>Estado</th><th>Acción</th></tr>
+                                <tr>
+                                    <td>Cámara de Comercio</td><td>01/11/2025</td><td>01/12/2025</td><td>Por vencer</td>
+                                    <td><button class="wf-btn wf-btn-primary" onclick="abrirModalRenovar('Cámara de Comercio')">Renovar</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RUT</td><td>15/03/2025</td><td>15/03/2026</td><td>Vigente</td>
+                                    <td><button class="wf-btn" onclick="abrirModalRenovar('RUT')">Actualizar</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Certificación bancaria</td><td>—</td><td>—</td><td>Pendiente</td>
+                                    <td><button class="wf-btn wf-btn-primary" onclick="abrirModalRenovar('Certificación bancaria')">Cargar</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Póliza de responsabilidad civil</td><td>20/01/2025</td><td>20/01/2026</td><td>Vigente</td>
+                                    <td><button class="wf-btn" onclick="abrirModalRenovar('Póliza de responsabilidad civil')">Renovar</button></td>
+                                </tr>
+                            </table>`
+                        }]
+                    },
+                    {
+                        id: "prov_portafolio", label: "Portafolio, Cobertura y Contactos", widgets: [{
+                            id: 'w_prov_portafolio', title: 'Portafolio y Cobertura', size: 'w-12 h-5', content: `
+                            <div class="perfil-grid">
+                                <div>
+                                    <label class="wf-label">Portafolio de servicios</label>
+                                    <textarea class="wf-input" rows="3">Suministro de instrumentos musicales, sonido profesional y accesorios.</textarea>
+                                </div>
+                                <div>
+                                    <label class="wf-label">Líneas de contacto</label>
+                                    <input class="wf-input" value="comercial@abc.com">
+                                    <input class="wf-input" value="+57 601 555 1234">
+                                    <input class="wf-input" value="WhatsApp: +57 300 000 0000">
+                                </div>
+                            </div>
+                            <label class="wf-label">Zonas de cobertura</label>
+                            <div style="display:flex; gap:15px; flex-wrap:wrap; font-size:12px; margin-bottom:10px;">
+                                <label><input type="checkbox" checked> Bogotá D.C.</label>
+                                <label><input type="checkbox" checked> Medellín</label>
+                                <label><input type="checkbox"> Cali</label>
+                                <label><input type="checkbox"> Barranquilla</label>
+                                <label><input type="checkbox"> Nacional</label>
+                            </div>
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Portafolio y cobertura actualizados')">Guardar cambios</button>`
+                        }]
+                    }
+                ]
+            },
+            {
+                id: "prov_compras", label: "Compras y Contratación", icono: "check", children: [
+                    {
+                        id: "prov_rfq", label: "Solicitudes de Cotización (RFQ)", widgets: [{
+                            id: 'w_prov_rfq', title: 'Convocatorias Abiertas', size: 'w-12 h-4', content: `
+                            <table class="wf-table">
+                                <tr><th>Código</th><th>Objeto</th><th>Cierre</th><th>Estado</th><th>Acción</th></tr>
+                                <tr>
+                                    <td>RFQ-2025-0087</td><td>Suministro de micrófonos inalámbricos</td><td>28/11/2025</td><td>Abierta</td>
+                                    <td><button class="wf-btn wf-btn-primary" onclick="abrirModalCotizar('RFQ-2025-0087')">Cotizar</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RFQ-2025-0091</td><td>Consola de sonido profesional</td><td>02/12/2025</td><td>Abierta</td>
+                                    <td><button class="wf-btn wf-btn-primary" onclick="abrirModalCotizar('RFQ-2025-0091')">Cotizar</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RFQ-2025-0075</td><td>Servicio de instalación de audio</td><td>20/11/2025</td><td>Cerrada</td>
+                                    <td><button class="wf-btn" onclick="mostrarToast('La convocatoria ya cerró')">Ver resultado</button></td>
+                                </tr>
+                            </table>`
+                        }]
+                    },
+                    {
+                        id: "prov_propuesta", label: "Enviar Propuesta Económica y Técnica", widgets: [{
+                            id: 'w_prov_propuesta', title: 'Enviar Propuesta', size: 'w-8 h-5', content: `
+                            <label class="wf-label">Solicitud de cotización (RFQ)</label>
+                            <select class="wf-input">
+                                <option>RFQ-2025-0087 — Micrófonos inalámbricos</option>
+                                <option>RFQ-2025-0091 — Consola de sonido</option>
+                            </select>
+                            <div class="perfil-grid">
+                                <div><label class="wf-label">Valor de la propuesta (COP)</label><input type="number" class="wf-input" placeholder="0"></div>
+                                <div><label class="wf-label">Plazo de entrega (días)</label><input type="number" class="wf-input" placeholder="15"></div>
+                            </div>
+                            <label class="wf-label">Propuesta técnica (PDF)</label>
+                            <input type="file" class="wf-input">
+                            <label class="wf-label">Propuesta económica (PDF / XLSX)</label>
+                            <input type="file" class="wf-input">
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Propuesta enviada a la entidad para evaluación')">Enviar propuesta</button>`
+                        }]
+                    },
+                    {
+                        id: "prov_ordenes", label: "Órdenes de Compra y Contratos", widgets: [{
+                            id: 'w_prov_ordenes', title: 'Documentos Asignados', size: 'w-12 h-4', content: `
+                            <table class="wf-table">
+                                <tr><th>Documento</th><th>Tipo</th><th>Valor</th><th>Estado</th><th>Acción</th></tr>
+                                <tr>
+                                    <td>OC-2025-0147</td><td>Orden de compra</td><td>$12.500.000</td><td>Pendiente de aceptación</td>
+                                    <td><button class="wf-btn wf-btn-primary" onclick="abrirModalFirmar('Orden de Compra', 'OC-2025-0147')">Aceptar / Firmar</button></td>
+                                </tr>
+                                <tr>
+                                    <td>CT-2025-0032</td><td>Contrato de prestación de servicios</td><td>$8.000.000</td><td>Pendiente de firma</td>
+                                    <td><button class="wf-btn wf-btn-primary" onclick="abrirModalFirmar('Contrato de Prestación de Servicios', 'CT-2025-0032')">Aceptar / Firmar</button></td>
+                                </tr>
+                                <tr>
+                                    <td>OC-2025-0119</td><td>Orden de compra</td><td>$6.800.000</td><td>Firmada</td>
+                                    <td><button class="wf-btn" onclick="mostrarToast('Descargando documento firmado')">Descargar</button></td>
+                                </tr>
+                            </table>`
+                        }]
+                    }
+                ]
+            },
+            {
+                id: "prov_facturacion", label: "Facturación y Cuentas de Cobro", icono: "money", children: [
+                    {
+                        id: "prov_radicar", label: "Radicar Factura / Cuenta de Cobro", widgets: [{
+                            id: 'w_prov_radicar', title: 'Radicación', size: 'w-8 h-6', content: `
+                            <label class="wf-label">Orden de compra / Contrato activo</label>
+                            <select class="wf-input">
+                                <option>OC-2025-0147 — $12.500.000 (Vigente)</option>
+                                <option>CT-2025-0032 — $8.000.000 (Vigente)</option>
+                            </select>
+                            <label class="wf-label">Tipo de radicado</label>
+                            <select class="wf-input" onchange="toggleFormaRadicado(this.value)">
+                                <option value="juridica">Factura electrónica (Persona Jurídica)</option>
+                                <option value="natural">Cuenta de cobro (Persona Natural)</option>
+                            </select>
+                            <div id="form-radicado-juridica">
+                                <label class="wf-label">Factura electrónica — XML</label>
+                                <input type="file" class="wf-input">
+                                <label class="wf-label">Factura electrónica — PDF</label>
+                                <input type="file" class="wf-input">
+                            </div>
+                            <div id="form-radicado-natural" style="display:none;">
+                                <label class="wf-label">Número de cuenta de cobro</label>
+                                <input class="wf-input" placeholder="CC-2025-0147">
+                                <label class="wf-label">Concepto</label>
+                                <textarea class="wf-input" rows="2" placeholder="Descripción del servicio prestado"></textarea>
+                                <label class="wf-label">Valor</label>
+                                <input type="number" class="wf-input" placeholder="0">
+                            </div>
+                            <label class="wf-label">Soportes (informe de actividades, acta de recibido, PILA)</label>
+                            <input type="file" class="wf-input" multiple>
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Radicado RAD-2025-0457 creado. Estado: En revisión contable.')">Radicar documentos</button>`
+                        }]
+                    },
+                    {
+                        id: "prov_soportes", label: "Soportes Obligatorios", widgets: [{
+                            id: 'w_prov_soportes', title: 'Soportes del Mes', size: 'w-4 h-6', content: `
+                            <p style="font-size:12px; margin-bottom:10px;">Soportes obligatorios del periodo:</p>
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                <div style="border:1px solid #000; padding:8px;">
+                                    <label class="wf-label">Informe de actividades</label>
+                                    <input type="file" class="wf-input" style="margin-bottom:6px;">
+                                    <span style="font-size:11px;">Estado: Pendiente</span>
+                                </div>
+                                <div style="border:1px solid #000; padding:8px;">
+                                    <label class="wf-label">Acta de recibido a satisfacción (firmada)</label>
+                                    <input type="file" class="wf-input" style="margin-bottom:6px;">
+                                    <span style="font-size:11px;">Estado: Pendiente</span>
+                                </div>
+                                <div style="border:1px solid #000; padding:8px;">
+                                    <label class="wf-label">Planilla de seguridad social (PILA)</label>
+                                    <input type="file" class="wf-input" style="margin-bottom:6px;">
+                                    <span style="font-size:11px;">Estado: Pendiente</span>
+                                </div>
+                            </div>
+                            <button class="wf-btn wf-btn-primary" style="margin-top:10px;" onclick="mostrarToast('Soportes adjuntados al radicado RAD-2025-0457')">Adjuntar todos</button>`
+                        }]
+                    },
+                    {
+                        id: "prov_corregir", label: "Corregir Radicados Devueltos", widgets: [{
+                            id: 'w_prov_corregir', title: 'Radicados Devueltos', size: 'w-12 h-4', content: `
+                            <table class="wf-table">
+                                <tr><th>Radicado</th><th>OC / Contrato</th><th>Motivo de devolución</th><th>Estado</th><th>Acción</th></tr>
+                                <tr>
+                                    <td>RAD-2025-0398</td><td>OC-2025-0132</td><td>El XML no coincide con el valor de la OC</td><td>Rechazado</td>
+                                    <td><button class="wf-btn wf-btn-primary" onclick="abrirModalCorregir('RAD-2025-0398')">Corregir y radicar</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RAD-2025-0361</td><td>CT-2025-0029</td><td>Falta la planilla PILA del periodo</td><td>Rechazado</td>
+                                    <td><button class="wf-btn wf-btn-primary" onclick="abrirModalCorregir('RAD-2025-0361')">Corregir y radicar</button></td>
+                                </tr>
+                            </table>`
+                        }]
+                    }
+                ]
+            },
+            {
+                id: "prov_financiero", label: "Seguimiento Financiero y Tributario", icono: "chart", children: [
+                    {
+                        id: "prov_estado", label: "Estado de Radicados y Pagos", widgets: [{
+                            id: 'w_prov_estado', title: 'Estado de Radicados', size: 'w-12 h-4', content: `
+                            <table class="wf-table">
+                                <tr><th>Radicado</th><th>OC / Contrato</th><th>Valor</th><th>Estado</th><th>Acción</th></tr>
+                                <tr>
+                                    <td>RAD-2025-0461</td><td>OC-2025-0151</td><td>$3.200.000</td><td>Radicado</td>
+                                    <td><button class="wf-btn" onclick="abrirModalDetalleRadicado('RAD-2025-0461')">Ver detalle</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RAD-2025-0457</td><td>OC-2025-0147</td><td>$12.500.000</td><td>En revisión contable</td>
+                                    <td><button class="wf-btn" onclick="abrirModalDetalleRadicado('RAD-2025-0457')">Ver detalle</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RAD-2025-0432</td><td>CT-2025-0032</td><td>$8.000.000</td><td>Aprobado para pago</td>
+                                    <td><button class="wf-btn" onclick="abrirModalDetalleRadicado('RAD-2025-0432')">Ver detalle</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RAD-2025-0340</td><td>OC-2025-0119</td><td>$6.800.000</td><td>Pagado</td>
+                                    <td><button class="wf-btn" onclick="abrirModalDetalleRadicado('RAD-2025-0340')">Ver detalle</button></td>
+                                </tr>
+                                <tr>
+                                    <td>RAD-2025-0398</td><td>OC-2025-0132</td><td>$4.300.000</td><td>Rechazado</td>
+                                    <td><button class="wf-btn" onclick="abrirModalDetalleRadicado('RAD-2025-0398')">Ver detalle</button></td>
+                                </tr>
+                            </table>`
+                        }]
+                    },
+                    {
+                        id: "prov_descuentos", label: "Descuentos y Retenciones", widgets: [{
+                            id: 'w_prov_descuentos', title: 'Detalle de Descuentos', size: 'w-12 h-4', content: `
+                            <table class="wf-table">
+                                <tr><th>Radicado</th><th>Valor bruto</th><th>ReteFuente</th><th>ReteIVA</th><th>ReteICA</th><th>Neto pagado</th></tr>
+                                <tr>
+                                    <td>RAD-2025-0340</td><td>$6.800.000</td><td>-$136.000</td><td>-$0</td><td>-$61.200</td><td>$6.602.800</td>
+                                </tr>
+                                <tr>
+                                    <td>RAD-2025-0312</td><td>$4.500.000</td><td>-$90.000</td><td>-$0</td><td>-$40.500</td><td>$4.369.500</td>
+                                </tr>
+                            </table>
+                            <button class="wf-btn" style="margin-top:10px;" onclick="abrirModalDescuento('RAD-2025-0340')">Ver detalle del cálculo</button>`
+                        }]
+                    },
+                    {
+                        id: "prov_certificados", label: "Certificados de Retenciones", widgets: [{
+                            id: 'w_prov_certificados', title: 'Certificados Tributarios', size: 'w-6 h-4', content: `
+                            <table class="wf-table">
+                                <tr><th>Periodo</th><th>Tipo</th><th>Acción</th></tr>
+                                <tr><td>2025 — Bimestre 5</td><td>Retenciones practicadas</td><td><button class="wf-btn" onclick="mostrarToast('Descargando certificado bimestral 2025-5')">Descargar</button></td></tr>
+                                <tr><td>2025 — Bimestre 4</td><td>Retenciones practicadas</td><td><button class="wf-btn" onclick="mostrarToast('Descargando certificado bimestral 2025-4')">Descargar</button></td></tr>
+                                <tr><td>2024 — Anual</td><td>Certificado anual DIAN</td><td><button class="wf-btn" onclick="mostrarToast('Descargando certificado anual 2024')">Descargar</button></td></tr>
+                            </table>`
+                        }]
+                    },
+                    {
+                        id: "prov_pqr", label: "PQR / Solicitudes", widgets: [{
+                            id: 'w_prov_pqr', title: 'Enviar PQR', size: 'w-6 h-5', content: `
+                            <label class="wf-label">Área destinataria</label>
+                            <select class="wf-input">
+                                <option>Compras</option>
+                                <option>Tesorería</option>
+                                <option>Contabilidad</option>
+                            </select>
+                            <label class="wf-label">Asunto</label>
+                            <input class="wf-input" placeholder="Motivo de la solicitud">
+                            <label class="wf-label">Mensaje</label>
+                            <textarea class="wf-input" rows="3" placeholder="Describe tu solicitud"></textarea>
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('PQR radicada. Número: PQR-2025-0231')">Enviar PQR</button>`
+                        }]
+                    }
+                ]
+            },
+            {
+                id: "prov_ayuda", label: "Ayuda y Soporte", icono: "check", widgets: [{
+                    id: 'w_ayuda_prov', title: 'Ayuda', size: 'w-12 h-3', content: `
+                    <p style="margin-bottom:10px;">Contacto de soporte para proveedores.</p>
+                    <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Ticket de soporte creado')">Nuevo ticket</button>`
+                }]
+            }
+        ];
+
+        const estructuraPortal = {
+            admin: {
+                title: "Administrador",
+                menu: [
+                    {
+                        id: "social", label: "Social", icono: "users", children: [
+                            {
+                                id: "social_admin", label: "Administrar", children: [
+                                    { id: "adm_afiliados", label: "Administrar Afiliados", widgets: [{ id: 'w_adm_af', title: 'Afiliados', size: 'w-6 h-3', content: `<table class="wf-table"><tr><th>Nombre</th><th>Estado</th></tr><tr><td>Juan Pérez</td><td>Activo</td></tr></table>` }] },
+                                    { id: "adm_aseguradoras", label: "Administrar Aseguradoras", widgets: [{ id: 'w_adm_as', title: 'Aseguradoras', size: 'w-6 h-3', content: `<table class="wf-table"><tr><th>Nombre</th><th>NIT</th></tr><tr><td>Seguros SAS</td><td>900.123.456</td></tr></table>` }] }
+                                ]
+                            },
+                            {
+                                id: "social_gestion", label: "Gestión", children: [
+                                    { id: "gest_afiliaciones", label: "Afiliaciones", widgets: [{ id: 'w_ges_af', title: 'Nuevas Afiliaciones', size: 'w-12 h-3', content: `<table class="wf-table"><tr><th>Solicitante</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr><tr><td>María López</td><td>Hoy</td><td>Pendiente</td><td><button class="wf-btn">Aprobar</button></td></tr></table>` }] },
+                                    { id: "gest_domiciliaria", label: "Gestión Atención Domiciliaria", widgets: [{ id: 'w_ges_dom', title: 'Atención Domiciliaria', size: 'w-6 h-4', content: `<p>Solicitudes de visita domiciliaria.</p><button class="wf-btn wf-btn-primary">Nueva Solicitud</button>` }] },
+                                    { id: "consulta_afiliados", label: "Consulta Afiliados", widgets: [{ id: 'w_cons_af', title: 'Consultar Afiliado', size: 'w-12 h-3', content: `<label class="wf-label">Documento</label><input type="text" class="wf-input" placeholder="Ingrese ID"><button class="wf-btn wf-btn-primary">Buscar</button>` }] }
+                                ]
+                            },
+                            {
+                                id: "social_seguimiento", label: "Seguimiento", children: [
+                                    { id: "seg_casos", label: "Seguimiento de Casos", widgets: [{ id: 'w_seg_cas', title: 'Casos Activos', size: 'w-8 h-4', content: `<table class="wf-table"><tr><th>Caso</th><th>Estado</th></tr><tr><td>#1024</td><td>En Proceso</td></tr></table>` }] },
+                                    { id: "seg_reportes", label: "Reportes de Seguimiento", widgets: [{ id: 'w_seg_rep', title: 'Reportes', size: 'w-6 h-3', content: `<button class="wf-btn wf-btn-primary">Generar Reporte PDF</button>` }] }
+                                ]
+                            }
+                        ]
+                    },
+                    { id: "usuarios", label: "Gestión de Usuarios", icono: "users", widgets: [{ id: 'w_users', title: 'Listado Usuarios', size: 'w-12 h-4', content: `<table class="wf-table"><tr><th>Usuario</th><th>Rol</th><th>Acciones</th></tr><tr><td>Carlos B.</td><td>Productor</td><td><button class="wf-btn">Editar</button></td></tr></table>` }] },
+                    { id: "reportes", label: "Reportes del Sistema", icono: "chart", widgets: [{ id: 'w_rep_sys', title: 'Reportes', size: 'w-12 h-4', content: `<p>Estadísticas generales.</p>` }] },
+                    { id: "configuracion", label: "Configuración Global", icono: "check", widgets: [{ id: 'w_config', title: 'Configuración', size: 'w-12 h-4', content: `<p>Parámetros del sistema.</p>` }] },
+                    { id: "auditoria", label: "Auditoría", icono: "doc", widgets: [{ id: 'w_audit', title: 'Logs de Auditoría', size: 'w-12 h-4', content: `<p>Historial de acciones.</p>` }] },
+                    { id: "seguridad", label: "Seguridad", icono: "check", widgets: [{ id: 'w_seg', title: 'Seguridad', size: 'w-12 h-4', content: `<p>Roles y permisos.</p>` }] },
+                    { id: "respaldos", label: "Respaldos", icono: "grid", widgets: [{ id: 'w_back', title: 'Respaldos', size: 'w-12 h-4', content: `<p>Copias de seguridad.</p>` }] }
+                ]
+            },
+            empleado: {
+                title: "Empleado",
+                menu: [
+                    {
+                        id: "nomina", label: "Nómina y Pagos", icono: "money", children: [
+                            { id: "colillas", label: "Colillas de Pago", widgets: [{ id: 'w_colillas', title: 'Colillas de Pago', size: 'w-12 h-3', content: `<table class="wf-table"><tr><th>Mes</th><th>Acción</th></tr><tr><td>Octubre 2023</td><td><button class="wf-btn">Descargar</button></td></tr></table>` }] },
+                            { id: "certificados", label: "Certificados", widgets: [{ id: 'w_cert_fin', title: 'Certificados Financieros', size: 'w-12 h-3', content: `<table class="wf-table"><tr><th>Documento</th><th>Acción</th></tr><tr><td>Retención Fuente</td><td><button class="wf-btn">Descargar</button></td></tr></table>` }] }
+                        ]
+                    },
+                    {
+                        id: "solicitudes", label: "Solicitudes", icono: "doc", children: [
+                            { id: "prestamos", label: "Solicitudes Préstamos", widgets: [{ id: 'w_prest', title: 'Préstamos', size: 'w-6 h-4', content: `<label class="wf-label">Monto</label><input type="number" class="wf-input"><button class="wf-btn wf-btn-primary">Solicitar</button>` }] },
+                            { id: "vacaciones", label: "Solicitud Vacaciones", widgets: [{ id: 'w_vac', title: 'Vacaciones', size: 'w-6 h-4', content: `<label class="wf-label">Fecha Inicio</label><input type="date" class="wf-input"><button class="wf-btn wf-btn-primary">Enviar</button>` }] },
+                            { id: "recibos", label: "Recibos de Caja", widgets: [{ id: 'w_recibos', title: 'Recibos', size: 'w-6 h-4', content: `<p>Consulta tus recibos emitidos.</p>` }] }
+                        ]
+                    },
+                    { id: "documentos", label: "Radicación de Documentos", icono: "doc", widgets: [{ id: 'w_rad_doc', title: 'Radicar Documento', size: 'w-12 h-3', content: `<input type="file" class="wf-input"><button class="wf-btn wf-btn-primary">Subir</button>` }] },
+                    { id: "capacitaciones", label: "Capacitaciones", icono: "check", widgets: [{ id: 'w_capacit', title: 'Cursos Disponibles', size: 'w-12 h-3', content: `<p>Ingresa a los cursos internos.</p>` }] },
+                    { id: "directorio", label: "Directorio Interno", icono: "users", widgets: [{ id: 'w_directorio', title: 'Directorio', size: 'w-12 h-3', content: `<table class="wf-table"><tr><th>Área</th><th>Extensión</th></tr><tr><td>RRHH</td><td>102</td></tr></table>` }] },
+                    { id: "ayuda", label: "Centro de Ayuda", icono: "check", widgets: [{ id: 'w_ayuda_emp', title: 'Soporte', size: 'w-12 h-3', content: `<p>Contacta al equipo de soporte.</p>` }] }
+                ]
+            },
+            artista: { title: "Artista", menu: menuArtista },
+            productor: { title: "Productor", menu: menuProductor },
+            proveedor: { title: "Proveedor", menu: menuProveedor },
+            cliente: {
+                title: "Cliente",
+                menu: [
+                    {
+                        id: "certificados_cli", label: "Certificados", icono: "doc", children: [
+                            { id: "paz_salvo", label: "Descargar Paz y Salvo", widgets: [{ id: 'w_paz_salvo', title: 'Paz y Salvo', size: 'w-6 h-3', content: `<button class="wf-btn wf-btn-primary">Descargar PDF</button>` }] },
+                            { id: "certificados_cli_2", label: "Certificados Adicionales", widgets: [{ id: 'w_cert_cli', title: 'Certificados', size: 'w-6 h-3', content: `<p>Otros certificados.</p>` }] }
+                        ]
+                    },
+                    {
+                        id: "tramites_cli", label: "Trámites", icono: "check", children: [
+                            { id: "historial_cli", label: "Mis Trámites", widgets: [{ id: 'w_hist_cli', title: 'Historial', size: 'w-12 h-3', content: `<table class="wf-table"><tr><th>Trámite</th><th>Estado</th></tr><tr><td>Solicitud #552</td><td>En Proceso</td></tr></table>` }] },
+                            { id: "solicitar_info_cli", label: "Solicitar Información", widgets: [{ id: 'w_info_cli', title: 'Solicitar Info', size: 'w-12 h-3', content: `<p>Pide información.</p>` }] }
+                        ]
+                    },
+                    { id: "actualizar_docs_cli", label: "Actualizar Documentos", icono: "doc", widgets: [{ id: 'w_act_cli', title: 'Actualizar', size: 'w-12 h-3', content: `<input type="file" class="wf-input"><button class="wf-btn wf-btn-primary">Subir</button>` }] },
+                    { id: "trazabilidad_cli", label: "Trazabilidad de Trámites", icono: "check", widgets: [{ id: 'w_traz_cli', title: 'Trazabilidad', size: 'w-12 h-3', content: `<table class="wf-table"><tr><th>Trámite</th><th>Estado</th></tr><tr><td>#552</td><td>En Proceso</td></tr></table>` }] },
+                    { id: "soporte_cli", label: "Soporte", icono: "check", widgets: [{ id: 'w_sop_cli', title: 'Soporte', size: 'w-12 h-3', content: `<p>Contactar a soporte.</p>` }] }
+                ]
+            },
+            artistaprod: {
+                title: "Artista / Productor",
+                menu: [
+                    { id: "bloque_artista", label: "ARTISTA", icono: "users", children: menuArtista },
+                    { id: "bloque_productor", label: "PRODUCTOR", icono: "doc", children: menuProductor }
+                ]
+            }
+        };
+
+        const resumenesDashboard = {
+            admin: {
+                descripcion: "Control general de usuarios, solicitudes y actividad del sistema.",
+                acciones: ["Revisar solicitudes", "Administrar usuarios", "Consultar reportes"],
+                actividad: [
+                    ["Solicitud de afiliación", "Pendiente", "Hoy"],
+                    ["Validación de usuario", "En proceso", "Hoy"],
+                    ["Reporte del sistema", "Aprobado", "Ayer"]
+                ]
+            },
+            empleado: {
+                descripcion: "Seguimiento de solicitudes, pagos y tareas internas.",
+                acciones: ["Ver solicitudes", "Consultar pagos", "Abrir capacitaciones"],
+                actividad: [
+                    ["Solicitud de vacaciones", "Pendiente", "Hoy"],
+                    ["Documento laboral", "En proceso", "Hoy"],
+                    ["Colilla de pago", "Aprobado", "Ayer"]
+                ]
+            },
+            artista: {
+                descripcion: "Resumen de repertorio, regalías y gestiones artísticas.",
+                acciones: ["Consultar repertorio", "Revisar regalías", "Actualizar perfil artístico"],
+                actividad: [
+                    ["Actualización de repertorio", "Pendiente", "Hoy"],
+                    ["Liquidación de regalías", "En proceso", "Hoy"],
+                    ["Perfil artístico", "Aprobado", "Ayer"]
+                ]
+            },
+            productor: {
+                descripcion: "Seguimiento de producciones, declaraciones y pagos.",
+                acciones: ["Registrar producción", "Consultar declaraciones", "Revisar pagos"],
+                actividad: [
+                    ["Registro de producción", "Pendiente", "Hoy"],
+                    ["Declaración de uso", "En proceso", "Hoy"],
+                    ["Certificado tributario", "Aprobado", "Ayer"]
+                ]
+            },
+            proveedor: {
+                descripcion: "Estado de documentos, facturas radicadas y pagos.",
+                acciones: ["Radicar factura", "Renovar documentos", "Consultar pagos"],
+                actividad: [
+                    ["Factura RAD-2025-0457", "Pendiente", "Hoy"],
+                    ["Soportes de facturación", "En proceso", "Hoy"],
+                    ["Pago RAD-2025-0340", "Aprobado", "Ayer"]
+                ]
+            },
+            cliente: {
+                descripcion: "Resumen de trámites, certificados y solicitudes de servicio.",
+                acciones: ["Consultar trámites", "Descargar certificados", "Solicitar información"],
+                actividad: [
+                    ["Solicitud #552", "Pendiente", "Hoy"],
+                    ["Actualización de documentos", "En proceso", "Hoy"],
+                    ["Certificado de paz y salvo", "Aprobado", "Ayer"]
+                ]
+            },
+            artistaprod: {
+                descripcion: "Vista conjunta de tus gestiones como artista y productor.",
+                acciones: ["Consultar repertorio", "Registrar producción", "Revisar liquidaciones"],
+                actividad: [
+                    ["Actualización de repertorio", "Pendiente", "Hoy"],
+                    ["Registro de producción", "En proceso", "Hoy"],
+                    ["Liquidación de regalías", "Aprobado", "Ayer"]
+                ]
+            }
+        };
+
+        function crearWidgetDashboard(rolId, tituloPerfil) {
+            const resumen = resumenesDashboard[rolId];
+            const etiquetaRol = rolId === "admin" ? "Administrador + Empleado" : tituloPerfil;
+            const filas = resumen.actividad.map(([actividad, estado, fecha]) =>
+                `<tr><td>${actividad}</td><td>${estado}</td><td>${fecha}</td></tr>`
+            ).join("");
+            const acciones = resumen.acciones.map(accion =>
+                `<button class="wf-btn" onclick="mostrarToast('Vista simulada: ${accion}')">${accion}</button>`
+            ).join("");
+
+            return {
+                id: `w_dashboard_${rolId}`,
+                dashboard: true,
+                title: "Resumen general",
+                content: `
+                    <div class="dashboard-mockup">
+                        <div class="dashboard-mockup-header">
+                            <div>
+                                <small>Panel principal · Datos de ejemplo</small>
+                                <h2>Bienvenido, Carlos Andrés Bermúdez</h2>
+                                <p>${resumen.descripcion}</p>
+                            </div>
+                            <span class="dashboard-role">${etiquetaRol}</span>
+                        </div>
+                        <div class="dashboard-stat-grid">
+                            <article class="dashboard-stat"><span>Pendientes</span><strong>3</strong><small>Requieren atención</small></article>
+                            <article class="dashboard-stat"><span>En proceso</span><strong>2</strong><small>Seguimiento activo</small></article>
+                            <article class="dashboard-stat"><span>Aprobados</span><strong>8</strong><small>Completados</small></article>
+                            <article class="dashboard-stat"><span>Rechazados</span><strong>1</strong><small>Requieren corrección</small></article>
+                        </div>
+                        <div class="dashboard-lower">
+                            <section class="dashboard-panel">
+                                <h3>Actividad reciente</h3>
+                                <table class="wf-table">
+                                    <thead><tr><th>Actividad</th><th>Estado</th><th>Fecha</th></tr></thead>
+                                    <tbody>${filas}</tbody>
+                                </table>
+                            </section>
+                            <section class="dashboard-panel">
+                                <h3>Accesos rápidos</h3>
+                                <div class="dashboard-quick-actions">${acciones}</div>
+                            </section>
+                        </div>
+                    </div>`
+            };
+        }
+
+        let rolActual = 'admin';
+
+        function cambiarVista(vistaId, btnElement) {
+            document.querySelectorAll('.proto-nav button').forEach(b => b.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+
+            document.querySelectorAll('.auth-view').forEach(v => v.classList.remove('active'));
+            document.getElementById('internal-layout').classList.remove('active');
+            sincronizarModoMenu();
+            cerrarModal();
+            cerrarNotificaciones();
+
+            if (['login', 'registro', 'recuperar'].includes(vistaId)) {
+                document.getElementById('view-' + vistaId).classList.add('active');
+            } else {
+                document.getElementById('internal-layout').classList.add('active');
+                initRole(vistaId);
+            }
+        }
+
+        function initRole(rolId) {
+            rolActual = rolId;
+            const data = estructuraPortal[rolId];
+            document.getElementById('role-title').textContent = data.title;
+            document.getElementById('menu-search').value = '';
+
+            const menuList = document.getElementById('menu-list');
+            menuList.innerHTML = '';
+            cerrarTodasLasRamas();
+
+            const grid = document.getElementById('grid');
+            if (grid.classList.contains('perfil-mode')) {
+                grid.className = 'widget-grid';
+                grid.innerHTML = '';
+                document.getElementById('toolbar').innerHTML = '<span class="toolbar-label">Acciones disponibles:</span>';
+                document.getElementById('breadcrumb-title').textContent = 'Sección';
+            }
+
+            // Por si el perfil estaba abierto al cambiar de rol
+            modoPerfil(false);
+
+            const itemDashboard = {
+                id: `dashboard_${rolId}`,
+                label: "Dashboard",
+                icono: "chart",
+                widgets: [crearWidgetDashboard(rolId, data.title)]
+            };
+            menuList.appendChild(crearMenuDOM(itemDashboard, 1));
+            data.menu.forEach(item => {
+                const roleSection = rolId === 'artistaprod' ? item.label : '';
+                menuList.appendChild(crearMenuDOM(item, 1, roleSection));
+            });
+            menuList.firstElementChild.click();
+        }
+
+        function cerrarRamaMenu(node) {
+            const submenu = node.querySelector(':scope > .submenu, :scope > .subsubmenu');
+            if (!submenu) return;
+            submenu.classList.remove('open');
+            node.querySelectorAll('.submenu.open, .subsubmenu.open').forEach(branch => branch.classList.remove('open'));
+            node.querySelectorAll('.toggle-indicator').forEach(toggle => { toggle.textContent = '+'; });
+        }
+
+        function cerrarRamasFueraDeRuta(el) {
+            const menuList = document.getElementById('menu-list');
+            if (!menuList) return;
+
+            const route = new Set();
+            let current = el.closest('li[data-menu-node="true"]');
+            while (current && current !== menuList) {
+                route.add(current);
+                current = current.parentElement.closest('li[data-menu-node="true"]');
+            }
+
+            menuList.querySelectorAll('li[data-menu-node="true"]').forEach(branch => {
+                if (!route.has(branch)) cerrarRamaMenu(branch);
+            });
+        }
+
+        function cerrarTodasLasRamas() {
+            const menuList = document.getElementById('menu-list');
+            if (!menuList) return;
+            menuList.querySelectorAll('.submenu.open, .subsubmenu.open').forEach(branch => branch.classList.remove('open'));
+            menuList.querySelectorAll('.toggle-indicator').forEach(toggle => { toggle.textContent = '+'; });
+        }
+
+        function cerrarMenuResponsive() {
+            const layout = document.getElementById('internal-layout');
+            if (!window.matchMedia('(max-width: 900px)').matches) return;
+
+            const search = document.getElementById('menu-search');
+            if (search && search.value) {
+                search.value = '';
+                filtrarMenu('');
+            }
+            cerrarTodasLasRamas();
+            layout.classList.remove('menu-responsive-abierto');
+            document.getElementById('btnToggleSidebar').setAttribute('aria-expanded', 'false');
+        }
+
+        function contextoBusqueda(roleSection) {
+            return rolActual === 'artistaprod' && roleSection
+                ? `<span class="menu-search-context">${roleSection}</span>`
+                : '';
+        }
+
+        function crearMenuDOM(item, nivel, roleSection = '') {
+            const container = document.createElement('li');
+            container.dataset.menuNode = 'true';
+            container.dataset.menuLabel = item.label || '';
+            container.dataset.roleSection = roleSection;
+
+            if (item.children && item.children.length > 0) {
+                const divHeader = document.createElement('div');
+                divHeader.className = 'menu-item';
+                divHeader.dataset.menuLabel = item.label || '';
+                divHeader.dataset.roleSection = roleSection;
+                divHeader.innerHTML = `${iconoGenerico} <span>${item.label}</span>${contextoBusqueda(roleSection)}<span class="toggle-indicator">+</span>`;
+
+                const ulSub = document.createElement('ul');
+                ulSub.className = 'submenu';
+
+                divHeader.onclick = () => {
+                    const layout = document.getElementById('internal-layout');
+                    if (layout.classList.contains('sidebar-colapsado')) {
+                        layout.classList.remove('sidebar-colapsado');
+                        cerrarRamasFueraDeRuta(container);
+                        ulSub.classList.add('open');
+                        divHeader.querySelector('.toggle-indicator').textContent = '-';
+                        setTimeout(ajustarPerfil, 350);
+                    } else {
+                        const isOpen = ulSub.classList.contains('open');
+                        cerrarRamasFueraDeRuta(container);
+                        if (isOpen) {
+                            cerrarRamaMenu(container);
+                        } else {
+                            ulSub.classList.add('open');
+                            divHeader.querySelector('.toggle-indicator').textContent = '-';
+                        }
+                    }
+                };
+
+                container.appendChild(divHeader);
+
+                item.children.forEach(child => {
+                    if (child.children) {
+                        const subLi = document.createElement('li');
+                        subLi.dataset.menuNode = 'true';
+                        subLi.dataset.menuLabel = child.label || '';
+                        subLi.dataset.roleSection = roleSection;
+                        const subHeader = document.createElement('div');
+                        subHeader.className = 'submenu-item';
+                        subHeader.dataset.menuLabel = child.label || '';
+                        subHeader.dataset.roleSection = roleSection;
+                        subHeader.innerHTML = `<span>${child.label}</span>${contextoBusqueda(roleSection)}<span class="toggle-indicator">+</span>`;
+
+                        const subSubUl = document.createElement('ul');
+                        subSubUl.className = 'subsubmenu';
+
+                        subHeader.onclick = () => {
+                            const isOpen = subSubUl.classList.contains('open');
+                            cerrarRamasFueraDeRuta(subLi);
+                            if (isOpen) {
+                                cerrarRamaMenu(subLi);
+                            } else {
+                                subSubUl.classList.add('open');
+                                subHeader.querySelector('.toggle-indicator').textContent = '-';
+                            }
+                        };
+
+                        subLi.appendChild(subHeader);
+
+                        child.children.forEach(subChild => {
+                            const finalLi = document.createElement('li');
+                            finalLi.className = 'subsubmenu-item';
+                            finalLi.dataset.menuNode = 'true';
+                            finalLi.dataset.menuLabel = subChild.label || '';
+                            finalLi.dataset.roleSection = roleSection;
+                            finalLi.innerHTML = `<span>${subChild.label}</span>${contextoBusqueda(roleSection)}`;
+                            finalLi.onclick = () => {
+                                cerrarRamasFueraDeRuta(finalLi);
+                                document.querySelectorAll('.subsubmenu-item, .submenu-item, .menu-item').forEach(el => el.classList.remove('active'));
+                                finalLi.classList.add('active');
+                                document.getElementById('breadcrumb-title').textContent = subChild.label;
+                                renderizarSeccion(subChild.widgets || []);
+                                cerrarMenuResponsive();
+                            };
+                            subSubUl.appendChild(finalLi);
+                        });
+
+                        subLi.appendChild(subSubUl);
+                        ulSub.appendChild(subLi);
+                    } else {
+                        const subLi = document.createElement('li');
+                        subLi.className = 'submenu-item';
+                        subLi.dataset.menuNode = 'true';
+                        subLi.dataset.menuLabel = child.label || '';
+                        subLi.dataset.roleSection = roleSection;
+                        subLi.innerHTML = `<span>${child.label}</span>${contextoBusqueda(roleSection)}`;
+                        subLi.onclick = () => {
+                            cerrarRamasFueraDeRuta(subLi);
+                            document.querySelectorAll('.subsubmenu-item, .submenu-item, .menu-item').forEach(el => el.classList.remove('active'));
+                            subLi.classList.add('active');
+                            document.getElementById('breadcrumb-title').textContent = child.label;
+                            renderizarSeccion(child.widgets || []);
+                            cerrarMenuResponsive();
+                        };
+                        ulSub.appendChild(subLi);
+                    }
+                });
+
+                container.appendChild(ulSub);
+            } else {
+                container.className = 'menu-item';
+                container.dataset.menuLabel = item.label || '';
+                container.innerHTML = `${iconoGenerico} <span>${item.label}</span>${contextoBusqueda(roleSection)}`;
+                container.onclick = () => {
+                    cerrarRamasFueraDeRuta(container);
+                    document.querySelectorAll('.subsubmenu-item, .submenu-item, .menu-item').forEach(el => el.classList.remove('active'));
+                    container.classList.add('active');
+                    document.getElementById('breadcrumb-title').textContent = item.label;
+                    renderizarSeccion(item.widgets || []);
+                    cerrarMenuResponsive();
+                };
+            }
+
+            return container;
+        }
+
+        function renderizarSeccion(widgets) {
+            const toolbar = document.getElementById('toolbar');
+            const grid = document.getElementById('grid');
+            const esDashboard = Boolean(widgets && widgets.length === 1 && widgets[0].dashboard);
+
+            grid.className = 'widget-grid';
+            grid.classList.toggle('dashboard-mode', esDashboard);
+            modoPerfil(false);
+
+            toolbar.innerHTML = '<span class="toolbar-label">Acciones disponibles:</span>';
+            toolbar.style.display = esDashboard ? 'none' : '';
+            grid.innerHTML = '';
+
+            if (esDashboard) {
+                grid.innerHTML = widgets[0].content;
+                return;
+            }
+
+            if (!widgets || widgets.length === 0) {
+                grid.innerHTML = '<div style="grid-column: span 12; text-align:center; padding:50px; color:#666; border:2px dashed #000;">Selecciona una opción con contenido</div>';
+                return;
+            }
+
+            widgets.forEach(w => {
+                const chip = document.createElement('div');
+                chip.className = 'draggable-chip';
+                chip.textContent = w.title;
+                chip.onclick = () => {
+                    if (!document.getElementById('widget-' + w.id)) {
+                        insertarWidget(w);
+                        mostrarToast(`"${w.title}" agregado`);
+                    } else {
+                        mostrarToast('Esta herramienta ya está en pantalla');
+                    }
+                };
+                toolbar.appendChild(chip);
+            });
+
+            widgets.forEach(w => { insertarWidget(w); });
+        }
+
+        function insertarWidget(w) {
+            const grid = document.getElementById('grid');
+            if (document.getElementById('widget-' + w.id)) return;
+
+            const el = document.createElement('div');
+            el.className = `widget ${w.size}`;
+            el.id = `widget-${w.id}`;
+            el.innerHTML = `
+            <div class="widget-head">
+                <span>${w.title}</span>
+                <div class="widget-tools">
+                    <button class="widget-btn" onclick="this.closest('.widget').classList.toggle('minimizado')">_</button>
+                    <button class="widget-btn" onclick="toggleFijo('${w.id}')">Fijar</button>
+                    <button class="widget-btn" onclick="this.closest('.widget').remove()">X</button>
+                </div>
+            </div>
+            <div class="widget-body">${w.content}</div>
+            <div class="widget-resize"></div>
+        `;
+            grid.appendChild(el);
+            initDragAndDrop();
+        }
+
+        function toggleFijo(id) {
+            const el = document.getElementById('widget-' + id);
+            if (el) {
+                el.classList.toggle('widget-fijo');
+                mostrarToast(el.classList.contains('widget-fijo') ? 'Widget anclado' : 'Widget liberado');
+            }
+        }
+
+        function abrirModal(html, claseExtra) {
+            const box = document.getElementById('modal-content');
+            box.className = 'modal-box' + (claseExtra ? ' ' + claseExtra : '');
+            box.innerHTML = html;
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+
+        document.getElementById('modal-overlay').addEventListener('click', function (e) {
+            if (e.target === this) cerrarModal();
+        });
+
+        /* ===== Notificaciones ===== */
+        function toggleNotificaciones() {
+            document.getElementById('notif-panel').classList.toggle('active');
+        }
+
+        function cerrarNotificaciones() {
+            document.getElementById('notif-panel').classList.remove('active');
+        }
+
+        function verNotificacion(texto) {
+            cerrarNotificaciones();
+            mostrarToast(texto);
+        }
+
+        // Cierra el panel al hacer clic fuera o presionar Escape
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.notif-wrapper')) cerrarNotificaciones();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') cerrarNotificaciones();
+        });
+
+        /* ===== Mi perfil ===== */
+        // Activa o desactiva la vista sin scroll (oculta la barra de acciones para ganar espacio)
+        function modoPerfil(activo) {
+            document.getElementById('canvas-principal').classList.toggle('sin-scroll', activo);
+            document.getElementById('toolbar').style.display = activo ? 'none' : '';
+        }
+
+        // Si la pantalla es muy baja, reduce el perfil lo justo para que los botones siempre se vean
+        function ajustarPerfil() {
+            const canvas = document.getElementById('canvas-principal');
+            const pagina = document.querySelector('#grid .perfil-page');
+            if (!pagina || !canvas.clientHeight) return;
+
+            pagina.style.zoom = 1;
+            if (window.matchMedia('(max-width: 700px)').matches) return;
+            const estilos = getComputedStyle(canvas);
+            const disponible = canvas.clientHeight - parseFloat(estilos.paddingTop) - parseFloat(estilos.paddingBottom) - 4;
+            const alto = pagina.offsetHeight;
+            if (alto > disponible) pagina.style.zoom = disponible / alto;
+        }
+
+        window.addEventListener('resize', ajustarPerfil);
+
+        function mostrarTabPerfil(tab, btn) {
+            document.querySelectorAll('.perfil-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.perfil-tab-content').forEach(c => c.classList.remove('active'));
+            const contenido = document.getElementById('perfil-tab-' + tab);
+            if (contenido) contenido.classList.add('active');
+            ajustarPerfil();
+        }
+
+        function abrirPerfil() {
+            const rol = rolActual;
+            const titulo = estructuraPortal[rol] ? estructuraPortal[rol].title : 'Usuario';
+            const esProveedor = rol === 'proveedor';
+            const esMixto = rol === 'artistaprod';
+
+            const listaRoles = esMixto ? ['Artista', 'Productor'] : [titulo];
+            const chips = listaRoles.map(r => `<span class="perfil-chip">${r}</span>`).join('');
+
+            const identidad = esProveedor ? `
+                <div class="perfil-grid cols-3">
+                    <div><label class="wf-label">Razón social</label><input class="wf-input" value="Suministros Musicales ABC S.A.S."></div>
+                    <div><label class="wf-label">NIT</label><input class="wf-input" value="900.123.456-7"></div>
+                    <div><label class="wf-label">Representante legal</label><input class="wf-input" value="Carlos A. Bermúdez"></div>
+                    <div><label class="wf-label">Correo corporativo</label><input class="wf-input" value="compras@abc.com"></div>
+                    <div><label class="wf-label">Teléfono</label><input class="wf-input" value="+57 601 555 1234"></div>
+                    <div><label class="wf-label">Dirección</label><input class="wf-input" value="Calle 100 # 15-20, Bogotá"></div>
+                </div>
+            ` : `
+                <div class="perfil-grid cols-4">
+                    <div><label class="wf-label">Nombres</label><input class="wf-input" value="Carlos Andrés"></div>
+                    <div><label class="wf-label">Apellidos</label><input class="wf-input" value="Bermúdez Ruiz"></div>
+                    <div><label class="wf-label">Tipo de documento</label><select class="wf-input"><option>CC</option><option>CE</option><option>Pasaporte</option></select></div>
+                    <div><label class="wf-label">Número de documento</label><input class="wf-input" value="1.020.304.050"></div>
+                    <div><label class="wf-label">Fecha de nacimiento</label><input type="date" class="wf-input" value="1990-05-14"></div>
+                    <div><label class="wf-label">Correo electrónico</label><input class="wf-input" value="carlos@correo.com"></div>
+                    <div><label class="wf-label">Teléfono</label><input class="wf-input" value="+57 300 000 0000"></div>
+                    <div><label class="wf-label">Dirección</label><input class="wf-input" value="Carrera 45 # 22-10, Bogotá"></div>
+                </div>
+            `;
+
+            const bancoTitulo = {
+                admin: 'Cuenta de nómina',
+                empleado: 'Cuenta de nómina',
+                artista: 'Cuenta para regalías y anticipos',
+                productor: 'Cuenta para pagos de facturación',
+                proveedor: 'Cuenta para pagos de facturas',
+                cliente: 'Cuenta para devoluciones',
+                artistaprod: 'Cuenta para regalías (Artista)'
+            }[rol] || 'Cuenta bancaria';
+
+            const titularDefault = esProveedor ? 'Suministros Musicales ABC S.A.S.' : 'Carlos A. Bermúdez';
+
+            const bloqueBanco = (tituloBloque, titular, columnas) => `
+                <div class="perfil-seccion">
+                    <h4>${tituloBloque}</h4>
+                    <div class="perfil-grid ${columnas}">
+                        <div><label class="wf-label">Banco</label><select class="wf-input"><option>Bancolombia</option><option>Davivienda</option><option>BBVA Colombia</option><option>Banco de Bogotá</option><option>Banco Popular</option></select></div>
+                        <div><label class="wf-label">Tipo de cuenta</label><select class="wf-input"><option>Ahorros</option><option>Corriente</option></select></div>
+                        <div><label class="wf-label">Número de cuenta</label><input class="wf-input" value="**** **** **** 4821"></div>
+                        <div><label class="wf-label">Titular</label><input class="wf-input" value="${titular}"></div>
+                    </div>
+                    <label class="wf-label">Certificación bancaria (PDF, no mayor a 30 días)</label>
+                    <div class="perfil-fila">
+                        <input type="file" class="wf-input">
+                        <button class="wf-btn" onclick="mostrarToast('Certificación bancaria actualizada')">Subir</button>
+                    </div>
+                </div>
+            `;
+
+            let bancoHtml;
+            if (esMixto) {
+                bancoHtml = `
+                    <div style="font-size:12px; margin-bottom:8px; border:1px dashed #000; padding:5px 8px; background:#fff;">
+                        <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox"> Usar la misma cuenta bancaria para regalías y facturación</label>
+                    </div>
+                    <div class="perfil-columnas cols-2">
+                        ${bloqueBanco('Cuenta para regalías y anticipos (Artista)', 'Carlos A. Bermúdez', '')}
+                        ${bloqueBanco('Cuenta para pagos de facturación (Productor)', 'Carlos A. Bermúdez', '')}
+                    </div>
+                `;
+            } else {
+                bancoHtml = bloqueBanco(bancoTitulo, titularDefault, 'cols-4');
+            }
+
+            const html = `
+                <div class="perfil-page">
+                    <div class="perfil-encabezado">
+                        <h3>Mi perfil</h3>
+                        <div class="perfil-roles">${chips}</div>
+                    </div>
+
+                    <div class="perfil-tabs">
+                        <button class="perfil-tab active" onclick="mostrarTabPerfil('personal', this)">Información personal</button>
+                        <button class="perfil-tab" onclick="mostrarTabPerfil('bancaria', this)">Información bancaria</button>
+                        <button class="perfil-tab" onclick="mostrarTabPerfil('cuenta', this)">Ajustes de cuenta</button>
+                    </div>
+
+                    <div class="perfil-tab-content active" id="perfil-tab-personal">
+                        <div class="perfil-seccion">
+                            <h4>Datos de identificación</h4>
+                            ${identidad}
+                        </div>
+                        <div class="perfil-seccion">
+                            <h4>Roles y permisos</h4>
+                            <div class="perfil-roles" style="font-size:12px; align-items:center;">Roles activos en el portal: ${chips}</div>
+                        </div>
+                        <div class="perfil-acciones">
+                            <button class="wf-btn" onclick="cerrarPerfil()">Cancelar</button>
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Información personal actualizada')">Guardar cambios</button>
+                        </div>
+                    </div>
+
+                    <div class="perfil-tab-content" id="perfil-tab-bancaria">
+                        ${bancoHtml}
+                        <div class="perfil-acciones">
+                            <button class="wf-btn" onclick="cerrarPerfil()">Cancelar</button>
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Información bancaria actualizada')">Guardar cambios</button>
+                        </div>
+                    </div>
+
+                    <div class="perfil-tab-content" id="perfil-tab-cuenta">
+                        <div class="perfil-columnas cols-3">
+                            <div class="perfil-seccion">
+                                <h4>Seguridad</h4>
+                                <label class="wf-label">Contraseña actual</label>
+                                <div class="perfil-password-wrapper">
+                                    <input type="password" class="wf-input" id="perfil-password-actual">
+                                    <button type="button" class="perfil-password-toggle" aria-label="Mostrar contraseña" onclick="togglePasswordVisibility('perfil-password-actual', this.querySelector('svg'))">
+                                        <svg class="toggle-password-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    </button>
+                                </div>
+                                <label class="wf-label">Nueva contraseña</label>
+                                <div class="perfil-password-wrapper">
+                                    <input type="password" class="wf-input" id="perfil-password-nueva">
+                                    <button type="button" class="perfil-password-toggle" aria-label="Mostrar contraseña" onclick="togglePasswordVisibility('perfil-password-nueva', this.querySelector('svg'))">
+                                        <svg class="toggle-password-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    </button>
+                                </div>
+                                <label class="wf-label">Confirmar nueva contraseña</label>
+                                <div class="perfil-password-wrapper">
+                                    <input type="password" class="wf-input" id="perfil-password-confirmar">
+                                    <button type="button" class="perfil-password-toggle" aria-label="Mostrar contraseña" onclick="togglePasswordVisibility('perfil-password-confirmar', this.querySelector('svg'))">
+                                        <svg class="toggle-password-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    </button>
+                                </div>
+                                <label class="perfil-check"><input type="checkbox" checked> Autenticación en dos pasos (2FA)</label>
+                            </div>
+                            <div class="perfil-seccion">
+                                <h4>Notificaciones</h4>
+                                <label class="perfil-check"><input type="checkbox" checked> Correo electrónico</label>
+                                <label class="perfil-check"><input type="checkbox"> SMS</label>
+                                <label class="perfil-check"><input type="checkbox" checked> Notificaciones en el portal</label>
+                            </div>
+                            <div class="perfil-seccion">
+                                <h4>Preferencias</h4>
+                                <label class="wf-label">Idioma</label>
+                                <select class="wf-input"><option>Español</option><option>Inglés</option></select>
+                                <label class="wf-label">Zona horaria</label>
+                                <select class="wf-input"><option>(GMT-5) Bogotá</option><option>(GMT-5) Lima</option></select>
+                            </div>
+                        </div>
+                        <div class="perfil-acciones">
+                            <button class="wf-btn" onclick="cerrarPerfil()">Cancelar</button>
+                            <button class="wf-btn wf-btn-primary" onclick="mostrarToast('Ajustes de cuenta guardados')">Guardar cambios</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const grid = document.getElementById('grid');
+
+            document.querySelectorAll('.subsubmenu-item, .submenu-item, .menu-item').forEach(el => el.classList.remove('active'));
+
+            grid.className = 'widget-grid perfil-mode';
+            grid.innerHTML = html;
+            document.getElementById('breadcrumb-title').textContent = 'Mi perfil';
+
+            const canvas = document.getElementById('canvas-principal');
+            canvas.scrollTop = 0;
+            modoPerfil(true);
+            ajustarPerfil();
+        }
+
+        function cerrarPerfil() {
+            const grid = document.getElementById('grid');
+            grid.className = 'widget-grid';
+            grid.innerHTML = '<div style="grid-column: span 12; text-align:center; padding:50px; color:#666; border:2px dashed #000;">Mi perfil cerrado. Selecciona una opción del menú lateral.</div>';
+            document.getElementById('breadcrumb-title').textContent = 'Inicio';
+            document.getElementById('toolbar').innerHTML = '<span class="toolbar-label">Acciones disponibles:</span>';
+
+            modoPerfil(false);
+
+            document.getElementById('canvas-principal').scrollTop = 0;
+        }
+
+        function abrirModalRenovar(doc) {
+            abrirModal(`
+                <h3>Renovar documento</h3>
+                <p style="font-size:12px; margin-bottom:12px;">Documento: <b>${doc}</b></p>
+                <label class="wf-label">Archivo PDF</label>
+                <input type="file" class="wf-input">
+                <label class="wf-label">Fecha de expedición</label>
+                <input type="date" class="wf-input">
+                <label class="wf-label">Fecha de vencimiento</label>
+                <input type="date" class="wf-input">
+                <div class="perfil-acciones">
+                    <button class="wf-btn" onclick="cerrarModal()">Cancelar</button>
+                    <button class="wf-btn wf-btn-primary" onclick="cerrarModal(); mostrarToast('${doc} renovado correctamente')">Radicar renovación</button>
+                </div>
+            `);
+        }
+
+        function abrirModalCotizar(codigo) {
+            abrirModal(`
+                <h3>Cotizar ${codigo}</h3>
+                <div style="border:1px solid #000; padding:12px; font-size:12px; margin-bottom:12px; background:#fafafa;">
+                    <p><b>Objeto:</b> Suministro de equipos de audio profesional</p>
+                    <p><b>Cierre:</b> 28/11/2025</p>
+                    <p><b>Condiciones:</b> Entrega en Bogotá, garantía mínima de 12 meses.</p>
+                </div>
+                <label class="wf-label">Valor de la oferta (COP)</label>
+                <input type="number" class="wf-input" placeholder="0">
+                <label class="wf-label">Plazo de entrega (días)</label>
+                <input type="number" class="wf-input" placeholder="15">
+                <label class="wf-label">Propuesta técnica (PDF)</label>
+                <input type="file" class="wf-input">
+                <label class="wf-label">Propuesta económica (PDF / XLSX)</label>
+                <input type="file" class="wf-input">
+                <div class="perfil-acciones">
+                    <button class="wf-btn" onclick="cerrarModal()">Cancelar</button>
+                    <button class="wf-btn wf-btn-primary" onclick="cerrarModal(); mostrarToast('Propuesta enviada para ${codigo}')">Enviar propuesta</button>
+                </div>
+            `);
+        }
+
+        function abrirModalFirmar(tipo, codigo) {
+            abrirModal(`
+                <h3>${tipo}</h3>
+                <p style="font-size:12px; margin-bottom:12px;">Documento: <b>${codigo}</b></p>
+                <div style="border:1px solid #000; padding:12px; font-size:12px; margin-bottom:12px; background:#fafafa;">
+                    <p><b>Objeto:</b> Suministro de equipos de audio</p>
+                    <p><b>Valor:</b> $12.500.000</p>
+                    <p><b>Plazo:</b> 30 días calendario</p>
+                    <p><b>Supervisor:</b> Área de Compras ACINPRO</p>
+                </div>
+                <label style="font-size:12px; display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+                    <input type="checkbox"> Acepto las condiciones y autorizo la firma electrónica.
+                </label>
+                <div class="perfil-acciones">
+                    <button class="wf-btn" onclick="cerrarModal()">Cancelar</button>
+                    <button class="wf-btn wf-btn-primary" onclick="cerrarModal(); mostrarToast('${codigo} firmado y aceptado correctamente')">Firmar / Aceptar</button>
+                </div>
+            `);
+        }
+
+        function abrirModalCorregir(radicado) {
+            abrirModal(`
+                <h3>Corregir radicado ${radicado}</h3>
+                <div style="border:1px solid #000; padding:12px; font-size:12px; margin-bottom:12px; background:#fafafa;">
+                    <p><b>Motivo de devolución:</b> El documento no coincide con el valor de la orden de compra.</p>
+                </div>
+                <label class="wf-label">Documento corregido</label>
+                <input type="file" class="wf-input">
+                <label class="wf-label">Observación para contabilidad</label>
+                <textarea class="wf-input" rows="2" placeholder="Describe la corrección realizada"></textarea>
+                <div class="perfil-acciones">
+                    <button class="wf-btn" onclick="cerrarModal()">Cancelar</button>
+                    <button class="wf-btn wf-btn-primary" onclick="cerrarModal(); mostrarToast('${radicado} corregido y radicado nuevamente')">Volver a radicar</button>
+                </div>
+            `);
+        }
+
+        function abrirModalDetalleRadicado(radicado) {
+            abrirModal(`
+                <h3>Detalle del radicado</h3>
+                <p style="font-size:12px; margin-bottom:12px;">Radicado: <b>${radicado}</b></p>
+                <table class="wf-table">
+                    <tr><th>Estado</th><th>Fecha</th><th>Observación</th></tr>
+                    <tr><td>Radicado</td><td>02/11/2025</td><td>Documentos recibidos</td></tr>
+                    <tr><td>En revisión contable</td><td>05/11/2025</td><td>Validación de soportes</td></tr>
+                    <tr><td>Aprobado para pago</td><td>10/11/2025</td><td>Programado en tesorería</td></tr>
+                </table>
+                <div class="perfil-acciones">
+                    <button class="wf-btn wf-btn-primary" onclick="cerrarModal()">Cerrar</button>
+                </div>
+            `);
+        }
+
+        function abrirModalDescuento(radicado) {
+            abrirModal(`
+                <h3>Detalle de descuentos</h3>
+                <p style="font-size:12px; margin-bottom:12px;">Radicado: <b>${radicado}</b></p>
+                <table class="wf-table">
+                    <tr><th>Concepto</th><th>Base</th><th>Tarifa</th><th>Valor</th></tr>
+                    <tr><td>ReteFuente</td><td>$6.800.000</td><td>2%</td><td>-$136.000</td></tr>
+                    <tr><td>ReteIVA</td><td>$0</td><td>0%</td><td>$0</td></tr>
+                    <tr><td>ReteICA</td><td>$6.800.000</td><td>0.9%</td><td>-$61.200</td></tr>
+                </table>
+                <p style="font-size:12px; margin-top:10px;"><b>Neto pagado:</b> $6.602.800</p>
+                <div class="perfil-acciones">
+                    <button class="wf-btn wf-btn-primary" onclick="cerrarModal()">Cerrar</button>
+                </div>
+            `);
+        }
+
+        function toggleFormaRadicado(tipo) {
+            const juridica = document.getElementById('form-radicado-juridica');
+            const natural = document.getElementById('form-radicado-natural');
+            if (juridica) juridica.style.display = tipo === 'juridica' ? '' : 'none';
+            if (natural) natural.style.display = tipo === 'natural' ? '' : 'none';
+        }
+
+        function filtrarMenu(texto) {
+            const term = texto.toLocaleLowerCase().trim();
+            const menuList = document.getElementById('menu-list');
+            const nodes = Array.from(menuList.querySelectorAll('li[data-menu-node="true"]'));
+            const controls = Array.from(menuList.querySelectorAll('.menu-item, .submenu-item, .subsubmenu-item'));
+
+            controls.forEach(control => {
+                control.style.display = '';
+                const context = control.querySelector('.menu-search-context');
+                if (context) context.classList.toggle('visible', Boolean(term));
+            });
+            nodes.forEach(node => {
+                node.style.display = '';
+                const submenu = node.querySelector(':scope > .submenu');
+                if (submenu) submenu.classList.remove('open');
+                const subsubmenu = node.querySelector(':scope > .subsubmenu');
+                if (subsubmenu) subsubmenu.classList.remove('open');
+            });
+            menuList.querySelectorAll('.toggle-indicator').forEach(toggle => { toggle.textContent = '+'; });
+            if (!term) return;
+
+            const matched = new Set(nodes.filter(node =>
+                (node.dataset.menuLabel || '').toLocaleLowerCase().includes(term) ||
+                (node.dataset.roleSection || '').toLocaleLowerCase().includes(term)
+            ));
+            const visibleNodes = new Set(matched);
+            matched.forEach(node => {
+                let parent = node.parentElement.closest('li[data-menu-node="true"]');
+                while (parent && parent !== menuList) {
+                    visibleNodes.add(parent);
+                    parent = parent.parentElement.closest('li[data-menu-node="true"]');
+                }
+            });
+
+            nodes.forEach(node => {
+                const visible = visibleNodes.has(node);
+                node.style.display = visible ? '' : 'none';
+
+                if (!visible) return;
+                const parentSubmenu = node.parentElement.closest('.submenu');
+                const parentSubsubmenu = node.parentElement.closest('.subsubmenu');
+                if (parentSubsubmenu) {
+                    parentSubsubmenu.classList.add('open');
+                    const parentHeader = parentSubsubmenu.previousElementSibling;
+                    const parentToggle = parentHeader && parentHeader.querySelector('.toggle-indicator');
+                    if (parentToggle) parentToggle.textContent = '-';
+                }
+                if (parentSubmenu) {
+                    parentSubmenu.classList.add('open');
+                    const parentHeader = parentSubmenu.previousElementSibling;
+                    const parentToggle = parentHeader && parentHeader.querySelector('.toggle-indicator');
+                    if (parentToggle) parentToggle.textContent = '-';
+                }
+
+                if (matched.has(node)) {
+                    const submenu = node.querySelector(':scope > .submenu');
+                    const subsubmenu = node.querySelector(':scope > .subsubmenu');
+                    const branch = submenu || subsubmenu;
+                    if (branch) {
+                        branch.classList.add('open');
+                        const header = branch.previousElementSibling;
+                        const toggle = header && header.querySelector('.toggle-indicator');
+                        if (toggle) toggle.textContent = '-';
+                    }
+                }
+            });
+            controls.forEach(control => {
+                const context = control.querySelector('.menu-search-context');
+                if (context) context.classList.toggle('visible', control.closest('li').style.display !== 'none');
+            });
+        }
+
+        let dragging = null, dragStart = null, placeholder = null;
+        const COLS = 12;
+
+        function initDragAndDrop() {
+            const grid = document.getElementById('grid');
+            if (!grid) return;
+
+            document.querySelectorAll('.widget:not(.widget-fijo)').forEach(w => {
+                const head = w.querySelector('.widget-head');
+                if (head.dataset.hasDrag) return;
+                head.dataset.hasDrag = "true";
+
+                head.addEventListener('mousedown', (e) => {
+                    if (e.target.closest('.widget-btn')) return;
+                    dragging = w;
+                    dragStart = { x: e.clientX, y: e.clientY, w: w.offsetWidth, h: w.offsetHeight };
+                    w.classList.add('arrastrando');
+
+                    placeholder = document.createElement('div');
+                    placeholder.className = 'widget-placeholder';
+                    placeholder.style.gridColumn = `span ${getSpan(w, 'col')}`;
+                    placeholder.style.gridRow = `span ${getSpan(w, 'row')}`;
+                    grid.insertBefore(placeholder, w);
+
+                    w.style.position = 'fixed';
+                    w.style.width = w.offsetWidth + 'px';
+                    w.style.height = w.offsetHeight + 'px';
+                    w.style.zIndex = 999;
+                    moveTo(e.clientX, e.clientY);
+                    document.body.style.cursor = 'grabbing';
+                });
+
+                const resizeHandle = w.querySelector('.widget-resize');
+                if (resizeHandle) {
+                    resizeHandle.addEventListener('mousedown', (e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        const startX = e.clientX, startY = e.clientY;
+                        const startW = w.offsetWidth, startH = w.offsetHeight;
+
+                        function onMove(ev) {
+                            const newW = Math.max(100, startW + (ev.clientX - startX));
+                            const newH = Math.max(80, startH + (ev.clientY - startY));
+                            const colSpan = Math.min(COLS, Math.max(1, Math.round(newW / (grid.offsetWidth / COLS))));
+                            const rowSpan = Math.max(1, Math.round(newH / 95));
+
+                            w.className = w.className.replace(/\bw-\d+\b/g, '').replace(/\bh-\d+\b/g, '').trim();
+                            w.classList.add(`w-${colSpan}`, `h-${rowSpan}`);
+                        }
+                        function onUp() {
+                            document.removeEventListener('mousemove', onMove);
+                            document.removeEventListener('mouseup', onUp);
+                        }
+                        document.addEventListener('mousemove', onMove);
+                        document.addEventListener('mouseup', onUp);
+                    });
+                }
+            });
+        }
+
+        function getSpan(el, type) {
+            const cls = [...el.classList].find(c => c.startsWith(type === 'col' ? 'w-' : 'h-'));
+            return cls ? parseInt(cls.split('-')[1]) : 4;
+        }
+
+        function moveTo(x, y) {
+            if (!dragging) return;
+            dragging.style.left = (x - dragStart.w / 2) + 'px';
+            dragging.style.top = (y - 15) + 'px';
+
+            placeholder.style.display = 'none';
+            const target = document.elementFromPoint(x, y)?.closest('.widget');
+            placeholder.style.display = '';
+
+            if (target && target !== dragging && !target.classList.contains('widget-placeholder') && !target.classList.contains('widget-fijo')) {
+                const r = target.getBoundingClientRect();
+                const after = (x - r.left) > r.width / 2;
+                document.getElementById('grid').insertBefore(placeholder, after ? target.nextSibling : target);
+            }
+        }
+
+        document.addEventListener('mousemove', (e) => { if (dragging) moveTo(e.clientX, e.clientY); });
+        document.addEventListener('mouseup', () => {
+            if (!dragging) return;
+            dragging.classList.remove('arrastrando');
+            dragging.style.position = ''; dragging.style.left = ''; dragging.style.top = '';
+            dragging.style.width = ''; dragging.style.height = ''; dragging.style.zIndex = '';
+            if (placeholder && placeholder.parentNode) placeholder.replaceWith(dragging);
+            dragging = null; document.body.style.cursor = '';
+        });
+
+        function mostrarToast(mensaje) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = mensaje;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+        const internalLayout = document.getElementById('internal-layout');
+        let sidebarColapsado = false;
+
+        function sincronizarModoMenu() {
+            const responsive = window.matchMedia('(max-width: 900px)').matches;
+            internalLayout.classList.remove('menu-responsive-abierto');
+            internalLayout.classList.toggle('sidebar-colapsado', !responsive && sidebarColapsado);
+            btnToggleSidebar.setAttribute('aria-expanded', 'false');
+        }
+
+        btnToggleSidebar.addEventListener('click', () => {
+            if (window.matchMedia('(max-width: 900px)').matches) {
+                const abierto = internalLayout.classList.toggle('menu-responsive-abierto');
+                btnToggleSidebar.setAttribute('aria-expanded', String(abierto));
+                return;
+            }
+            internalLayout.classList.toggle('sidebar-colapsado');
+            sidebarColapsado = internalLayout.classList.contains('sidebar-colapsado');
+            btnToggleSidebar.setAttribute('aria-expanded', String(!sidebarColapsado));
+            setTimeout(ajustarPerfil, 350);
+        });
+        window.addEventListener('resize', sincronizarModoMenu);
+        sincronizarModoMenu();
+
+        document.querySelector('.sidebar-search .icono-lupa').addEventListener('click', () => {
+            if (internalLayout.classList.contains('sidebar-colapsado')) {
+                internalLayout.classList.remove('sidebar-colapsado');
+                sidebarColapsado = false;
+                btnToggleSidebar.setAttribute('aria-expanded', 'true');
+                setTimeout(() => document.getElementById('menu-search').focus(), 300);
+                setTimeout(ajustarPerfil, 350);
+            }
+        });
+
+        function togglePasswordVisibility(inputId, iconElement) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                // Cambia el icono a "ojo tachado"
+                iconElement.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+            } else {
+                input.type = "password";
+                // Vuelve al icono de ojo normal
+                iconElement.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+            }
+            const control = iconElement.closest('.perfil-password-toggle');
+            if (control) {
+                control.setAttribute('aria-label', input.type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
+            }
+        }
+
+        // Iniciar en Login por defecto
+        cambiarVista('login', document.querySelector('.proto-nav button:nth-child(2)'));
+    </script>
+</body>
+</html>

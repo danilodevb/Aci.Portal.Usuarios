@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACINPRO — Espacio de trabajo del productor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body class="tema-claro" data-workspace="productor">
+    <div class="admin-shell">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="assets/clave-sol.png" alt="" class="admin-logo-img">
+                <div class="admin-logo-texto"><strong>ACINPRO</strong><span id="homeRolSubtitulo">Productor</span></div>
+            </div>
+            <div class="sidebar-search" style="position:relative;padding:10px 0;display:flex;align-items:center;justify-content:center">
+                <svg class="icono-lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#7ad9d1;pointer-events:none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="menu-search" placeholder="Buscar..." style="width:100%;padding:8px 10px 8px 34px;border-radius:8px;border:1px solid rgba(122,217,209,.5);font-size:12px" oninput="filtrarMenu(this.value)">
+            </div>
+            <nav class="admin-nav" id="homeNav"></nav>
+        </aside>
+        <main class="admin-main" id="homeMain" style="display:flex;flex-direction:column;overflow:hidden"></main>
+    </div>
+    <script src="js/workspaceConfig.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/estructuraPortal.js"></script>
+    <script src="js/motorWidgets.js"></script>
+    <script src="js/menuPortal.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>

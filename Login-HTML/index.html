@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACINPRO — Iniciar sesión</title>
+
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+          rel="stylesheet">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+
+<body>
+
+    <div class="pantalla">
+
+        <!-- =====================================================
+             ESCENARIO
+             ===================================================== -->
+
+        <div class="escenario"
+             aria-hidden="true">
+
+            <div class="brillo"></div>
+
+            <div class="logo-contenedor">
+
+                <div class="linea-luz"></div>
+
+                <!-- CLAVE DE SOL -->
+                <img class="logo"
+                     alt="Clave de sol decorativa de ACINPRO"
+                     src="assets/clave-sol.png">
+
+                <!-- ACINPRO -->
+                <div class="marca"
+                     aria-label="Acinpro">
+
+                    <span class="letra">A</span>
+                    <span class="letra">c</span>
+                    <span class="letra">i</span>
+                    <span class="letra">n</span>
+                    <span class="letra">p</span>
+                    <span class="letra">r</span>
+                    <span class="letra">o</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================================
+             FORMULARIO
+             ===================================================== -->
+
+        <section class="panel-login">
+
+            <h1 class="titulo">
+                Iniciar sesión
+                <span class="subtitulo">Portal web Acinpro</span>
+            </h1>
+
+            <form id="formularioLogin"
+                  autocomplete="on"
+                  novalidate>
+
+                <div class="campo">
+
+                    <input id="usuario"
+                           name="usuario"
+                           type="text"
+                           placeholder="Correo electrónico"
+                           autocomplete="username"
+                           required>
+
+                </div>
+
+                <div class="campo campo-password">
+
+                    <input id="contrasena"
+                           name="contrasena"
+                           type="password"
+                           placeholder="Contraseña"
+                           autocomplete="current-password"
+                           required>
+
+                    <!-- Botón del ojito -->
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" aria-label="Mostrar u ocultar contraseña">
+                        <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+
+                </div>
+
+                <div class="acciones">
+
+                    <label class="recordar">
+
+                        <input id="recordarme"
+                               type="checkbox">
+
+                        <span>
+                            Recordarme
+                        </span>
+
+                    </label>
+
+                    <button class="boton"
+                            type="submit">
+                        Ingresar
+                    </button>
+
+                </div>
+
+                <!-- Enlace oculto hasta que falle el login -->
+                <a href="recuperar.html"
+                   class="olvido oculto"
+                   id="olvido"
+                   aria-hidden="true">
+                    ¿Olvidaste tu contraseña?
+                </a>
+
+                <a href="registro.html" class="olvido registro-link">
+                    ¿No tienes cuenta? Crear una
+                </a>
+
+                <div class="estado"
+                     id="estado"
+                     aria-live="polite"></div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+    <!-- Script -->
+    <script src="js/workspaceConfig.js"></script>
+    <script src="js/login.js"></script>
+
+</body>
+</html>
